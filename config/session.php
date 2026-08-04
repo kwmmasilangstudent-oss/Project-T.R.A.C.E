@@ -5,7 +5,10 @@ ini_set('session.use_strict_mode', 1);
 ini_set('session.use_only_cookies', 1);
 ini_set('session.gc_maxlifetime', 7200);
 ini_set('session.cookie_lifetime', 0);
-if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+
+$forwardedProto = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? $_SERVER['REQUEST_SCHEME'] ?? ''));
+$isSecureRequest = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $forwardedProto === 'https' || !empty($_SERVER['HTTP_X_FORWARDED_SSL']);
+if ($isSecureRequest) {
     ini_set('session.cookie_secure', 1);
 }
 

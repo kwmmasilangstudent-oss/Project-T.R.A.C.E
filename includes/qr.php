@@ -3,7 +3,7 @@ require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../config/database.php';
 
 if (!defined('BASE_URL')) {
-    define('BASE_URL', '/FinalTrace');
+    define('BASE_URL', '/');
 }
 
 function buildQrPayload(int $residentId, string $fullName): string {

@@ -1,11 +1,12 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 requireAuth(['admin']);
+require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getDbConnection();
 
-if (!defined('BASE_URL')) { define('BASE_URL', '/FinalTrace'); }
+if (!defined('BASE_URL')) { define('BASE_URL', '/'); }
 
 function fmtBudgetShort($amount) {
     if ($amount === null || $amount == 0) return '0';

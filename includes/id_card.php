@@ -1,10 +1,11 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../config/database.php';
 requireAuth(['admin', 'secretary']);
 
 if (!defined('BASE_URL')) {
-    define('BASE_URL', '/FinalTrace');
+    define('BASE_URL', '/');
 }
 
 $residentId = isset($_GET['id']) ? (int)$_GET['id'] : 0;

@@ -1,12 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 requireAuth(['admin', 'secretary']);
+require_once __DIR__ . '/../config/constants.php';
 require_once __DIR__ . '/../config/database.php';
 
 $pdo = getDbConnection();
 
 if (!defined('BASE_URL')) {
-    define('BASE_URL', '/FinalTrace');
+    define('BASE_URL', '/');
 }
 
 require_once __DIR__ . '/../migrations/run.php';

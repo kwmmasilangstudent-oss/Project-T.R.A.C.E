@@ -1,6 +1,7 @@
     <?php
     require_once __DIR__ . '/../includes/auth.php';
     requireAuth(['resident']);
+    require_once __DIR__ . '/../config/constants.php';
     require_once __DIR__ . '/../config/database.php';
 
     $pdo = getDbConnection();
@@ -11,7 +12,7 @@
     header("Content-Security-Policy: default-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-src 'none';");
 
     if (!defined('BASE_URL')) {
-        define('BASE_URL', '/FinalTrace');
+        define('BASE_URL', '/');
     }
 
     $resident = null;
