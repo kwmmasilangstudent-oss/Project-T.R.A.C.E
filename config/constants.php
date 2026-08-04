@@ -1,17 +1,21 @@
 <?php
-// Set BASE_URL: Empty string for Railway/Production, '/FinalTrace' for local XAMPP
 if (!defined('BASE_URL')) {
-    define('BASE_URL', getenv('RAILWAY_ENVIRONMENT') ? '' : '/FinalTrace');
+    define('BASE_URL', (isset($_ENV['RAILWAY_ENVIRONMENT']) || isset($_SERVER['RAILWAY_ENVIRONMENT'])) ? '' : '/FinalTrace');
 }
 
 // Application constants
 const APP_NAME = 'Project T.R.A.C.E.';
 const APP_VERSION = '1.0.0';
 
-// Database constants (Fallback to local XAMPP if Railway ENV variables aren't present)
-define('DB_HOST', getenv('MYSQLHOST') ?: 'localhost');
-define('DB_PORT', getenv('MYSQLPORT') ?: '3306');
-define('DB_NAME', getenv('MYSQLDATABASE') ?: 'trace_db');
-define('DB_USER', getenv('MYSQLUSER') ?: 'root');
-define('DB_PASS', getenv('MYSQLPASSWORD') ?: '');
+// Helper function to read environment variables robustly
+function getEnvVar(string $key, string $default = ''): string {
+    return $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key) ?: $default;
+}
+
+// Database constants
+define('DB_HOST', getEnvVar('MYSQLHOST', '127.0.0.1'));
+define('DB_PORT', getEnvVar('MYSQLPORT', '3306'));
+define('DB_NAME', getEnvVar('MYSQLDATABASE', 'trace_db'));
+define('DB_USER', getEnvVar('MYSQLUSER', 'root'));
+define('DB_PASS', getEnvVar('MYSQLPASSWORD', ''));
 ?>
