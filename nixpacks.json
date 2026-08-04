@@ -11,6 +11,6 @@
         }
     },
     "start": {
-        "cmd": "php -S 0.0.0.0:$PORT -t ."
+        "cmd": "php -S 0.0.0.0:$PORT -c php.ini -t ."
     }
 }
