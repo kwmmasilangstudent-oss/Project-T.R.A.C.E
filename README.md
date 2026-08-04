@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Project T.R.A.C.E.
 
 > **T**ransparency • **R**esilience • **A**ccountability • **C**ommunity **V**erification • **E**conomic Growth
@@ -141,3 +142,6 @@ FinalTrace/
 ## License
 
 This project is developed for Barangay Tumalaytay governance and public service.
+=======
+# Project-T.R.A.C.E
+>>>>>>> 5edcb294b74ef61df514549131a2a38ac3cc43fa
