@@ -1,0 +1,2 @@
+ALTER TABLE users ADD COLUMN google_id VARCHAR(255) NULL UNIQUE AFTER password_hash;
+ALTER TABLE users MODIFY password_hash VARCHAR(255) NULL;

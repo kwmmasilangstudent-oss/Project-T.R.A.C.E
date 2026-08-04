@@ -1,0 +1,205 @@
+flowchart TD
+    Start((User Visits Site)) --> Landing[Landing Page<br/>landing/home.php]
+    
+    Landing --> |Click Login| AuthChoice{Login Method?}
+    AuthChoice --> |Email/Password| LoginForm[auth/login.php]
+    AuthChoice --> |Google OAuth| GoogleLogin[auth/google_login.php]
+    
+    LoginForm --> |POST| CSRF1{CSRF Valid?}
+    CSRF1 --> |No| LoginError[Show Error]
+    CSRF1 --> |Yes| RateLimit{Rate Limit?}
+    RateLimit --> |5 attempts/5min| RateError[Show Error]
+    RateLimit --> |Pass| ValidateCreds{Email & Password<br/>Match?}
+    ValidateCreds --> |No| LoginError
+    ValidateCreds --> |Yes| SessionSetup[Regenerate Session<br/>Store user_id, role, name]
+    
+    GoogleLogin --> GoogleCallback[auth/google_callback.php]
+    GoogleCallback --> |Exchange Code| GetGoogleInfo[Fetch Google Profile]
+    GetGoogleInfo --> LinkOrCreate{Account Exists?}
+    LinkOrCreate --> |Yes| LinkGoogle[Link google_id to user]
+    LinkOrCreate --> |No| CreateResident[Create new resident account]
+    LinkGoogle --> SessionSetup
+    CreateResident --> SessionSetup
+    
+    SessionSetup --> MainRouter[index.php<br/>Role Router]
+    
+    MainRouter --> |admin| AdminDash[admin/dashboard.php]
+    MainRouter --> |secretary| SecDash[secretary/dashboard.php]
+    MainRouter --> |resident| ResDash[resident/dashboard.php]
+    MainRouter --> |not logged in| Landing
+    
+    subgraph Admin Features
+        AdminDash --> AdminStats[Charts & Stats<br/>Chart.js]
+        AdminDash --> AdminNav{Sidebar Navigation}
+        
+        AdminNav --> |People & Records| AdminResidents[admin/residents.php]
+        AdminNav --> |People & Records| AdminProfiling[admin/resident_profiling.php<br/>Full CRUD + Tabs]
+        AdminNav --> |People & Records| AdminOfficials[admin/officials.php]
+        AdminNav --> |Operations| AdminProjects[admin/projects.php]
+        AdminNav --> |Operations| AdminBudget[admin/budget.php]
+        AdminNav --> |Operations| AdminAgenda[admin/agenda.php]
+        AdminNav --> |Operations| AdminDocs[admin/documents.php]
+        AdminNav --> |Operations| AdminApps[admin/applications.php]
+        AdminNav --> |Operations| AdminAppointments[admin/appointments.php]
+        AdminNav --> |Communication| AdminAnnounce[admin/announcements.php]
+        AdminNav --> |Surveillance| AdminQR[scanner/index.php]
+        AdminNav --> |Surveillance| AdminCCTV[admin/cctv.php]
+        AdminNav --> |System| AdminUsers[admin/users.php]
+        AdminNav --> |System| AdminReports[admin/reports.php]
+        AdminNav --> |System| AdminLogs[admin/logs.php]
+        AdminNav --> |System| AdminBackup[admin/backup.php]
+        AdminNav --> |System| AdminSettings[admin/settings.php]
+    end
+    
+    subgraph Secretary Features
+        SecDash --> SecStats[Pending Apps, Docs, Stats]
+        SecDash --> SecNav{Sidebar Navigation}
+        
+        SecNav --> |People & Records| SecResidents[secretary/residents.php]
+        SecNav --> |People & Records| SecProfiling[secretary/resident_profiling.php<br/>Same UI as Admin]
+        SecNav --> |Operations| SecProjects[secretary/projects.php]
+        SecNav --> |Operations| SecBudget[secretary/budget.php]
+        SecNav --> |Operations| SecAgenda[secretary/agenda.php]
+        SecNav --> |Operations| SecDocuments[secretary/documents.php]
+        SecNav --> |Operations| SecRequests[secretary/requests.php]
+        SecNav --> |Operations| SecAppointments[secretary/appointments.php]
+        SecNav --> |Communication| SecAnnounce[secretary/announcements.php]
+        SecNav --> |Communication| SecEventAttendees[secretary/event_attendees.php]
+        SecNav --> |Surveillance| SecQR[secretary/qr.php]
+        SecNav --> |System| SecReports[secretary/reports.php]
+        SecNav --> |System| SecSettings[secretary/settings.php]
+    end
+    
+    subgraph Resident Features
+        ResDash --> ResQuickActions[Quick Actions]
+        ResDash --> ResAnnouncements[Recent Announcements]
+        ResDash --> ResRequests[My Requests Table]
+        ResDash --> ResNav{Sidebar Navigation}
+        
+        ResNav --> Profile[resident/profile.php]
+        ResNav --> ResReq[resident/requests.php]
+        ResNav --> ResAppt[resident/appointments.php]
+        ResNav --> ResAnnounce[resident/announcements.php]
+        ResNav --> ResNotif[resident/notifications.php]
+        ResNav --> ResQR[resident/qr.php]
+        ResNav --> ResSettings[resident/settings.php]
+    end
+    
+    subgraph Core Module Flows
+        ResidentProfiling[Resident Profiling<br/>Tabbed Form] --> |Tab 1| PersonalInfo[Personal Information<br/>PCN, Name, Birth Date]
+        ResidentProfiling --> |Tab 2| Demographics[Demographics<br/>Sex, Civil Status, Citizenship]
+        ResidentProfiling --> |Tab 3| Location[Location & Housing<br/>Address, Purok, Materials]
+        ResidentProfiling --> |Tab 4| SocioEconomic[Socio-Economic<br/>Education, Occupation, Income]
+        ResidentProfiling --> |Tab 5| SpecialSectors[Special Sectors<br/>Checkboxes: Senior, PWD, etc.]
+        
+        PersonalInfo --> |Birth Date| AgeCalc[Auto-calculate Age<br/>PHP DateTime::diff]
+        SpecialSectors --> |PWD Checked| PWDConditional[Show pwd_disability_type<br/>JavaScript toggle]
+        SpecialSectors --> |Bulk Import| CSVImport[CSV/TSV/Paste Import<br/>Template Download]
+        
+        ApplicationFlow[Application Request<br/>7 Statuses] --> Submitted[submitted]
+        Submitted --> Pending[pending]
+        Pending --> UnderReview[under_review]
+        UnderReview --> Approved[approved]
+        Approved --> ReadyForPickup[ready_for_pickup]
+        ReadyForPickup --> Completed[completed]
+        UnderReview --> |Rejected| Rejected[rejected]
+        
+        Approved --> |Generate| DocGen[Document Generation<br/>10 Types + Auto-numbering]
+        DocGen --> QRGen[QR Code Generation<br/>PHP GD Library]
+        
+        QRSystem[QR Verification System] --> Scanner[HTML5 QR Scanner]
+        Scanner --> VerifyAPI[api/scan_handler.php]
+        VerifyAPI --> LogVerification[verification_logs table<br/>IP + User Agent]
+        
+        AnnouncementFlow[Announcement System<br/>7 Types] --> |Publish| NotifyUsers[Create Notifications<br/>per targeted role]
+        NotifyUsers --> |Resident reads| MarkRead[announcement_reads table]
+    end
+    
+    AdminProfiling --> ResidentProfiling
+    SecProfiling --> ResidentProfiling
+    
+    subgraph Security Layer
+        CSRF[CSRF Protection<br/>csrfField/validateCsrfToken]
+        RateLimit2[Login Rate Limiting<br/>5 attempts per 5 min]
+        SessionTimeout[30-min Idle Timeout<br/>enforceSessionTimeout]
+        AuditLog[Audit Logging<br/>logAudit - IP + UA]
+        InputSanitize[Input Sanitization<br/>sanitizeString, validateEmail]
+        PasswordHash[password_hash/verify<br/>Bcrypt]
+    end
+    
+    LoginForm --> CSRF
+    LoginForm --> RateLimit2
+    
+    subgraph Database Layer
+        DB[trace_db MySQL] --> UsersTable[users]
+        DB --> RolesTable[roles]
+        DB --> ResidentsTable[residents]
+        DB --> PersonalInfoTable[personal_information]
+        DB --> ApplicationsTable[applications]
+        DB --> DocumentsTable[documents]
+        DB --> AnnouncementsTable[announcements]
+        DB --> NotificationsTable[notifications]
+        DB --> ProjectsTable[projects]
+        DB --> BudgetTable[project_budget]
+        DB --> ExpensesTable[expenses]
+        DB --> AgendaTable[agenda]
+        DB --> QRCodesTable[qr_codes]
+        DB --> VerificationLogsTable[verification_logs]
+        DB --> SettingsTable[settings]
+        DB --> ActivityLogsTable[activity_logs]
+        DB --> AuditLogsTable[audit_logs]
+        DB --> SessionLogsTable[session_logs]
+        DB --> PasswordResetsTable[password_resets]
+        DB --> OfficialsTable[officials]
+        DB --> EventsTable[events]
+        DB --> GalleryTable[gallery]
+        DB --> ComplaintsTable[complaints]
+        DB --> AppointmentsTable[appointments]
+        DB --> HouseholdsTable[households]
+        DB --> DisasterReportsTable[disaster_reports]
+    end
+    
+    subgraph Theme System
+        ThemePref[User theme_preference<br/>light / dark / system]
+        SystemPref[OS prefers-color-scheme]
+        LightClass[html.light class]
+        DarkClass[html.dark class]
+        CSSVars[CSS Custom Properties<br/>:root overrides]
+        
+        ThemePref --> |light| LightClass
+        ThemePref --> |dark| DarkClass
+        ThemePref --> |system| SystemPref
+        SystemPref --> |light| LightClass
+        SystemPref --> |dark| DarkClass
+        LightClass --> CSSVars
+        DarkClass --> CSSVars
+        CSSVars --> |Updates| Sidebar[sb-wrap background]
+        CSSVars --> |Updates| Cards[glass-card colors]
+        CSSVars --> |Updates| Inputs[form controls]
+        CSSVars --> |Updates| Tables[table styles]
+        CSSVars --> |Updates| Modals[modal backgrounds]
+    end
+    
+    SessionSetup --> |Reads| ThemePref
+    Header[includes/header.php] --> |Applies| LightClass
+    Footer[includes/footer.php] --> |Contains| CSSVars
+    
+    subgraph AJAX Endpoints
+        MarkNotifRead[includes/ajax/mark_notifications_read.php]
+        DismissNotif[includes/ajax/dismiss_notification.php]
+        DashboardStats[admin/dashboard_stats.php]
+    end
+    
+    AdminDash --> DashboardStats
+    ResNotif --> MarkNotifRead
+    
+    style Start fill:#4CAF50,stroke:#2E7D32,color:#fff
+    style Landing fill:#2196F3,stroke:#1565C0,color:#fff
+    style LoginForm fill:#FF9800,stroke:#E65100,color:#fff
+    style AdminDash fill:#9C27B0,stroke:#6A1B9A,color:#fff
+    style SecDash fill:#673AB7,stroke:#4527A0,color:#fff
+    style ResDash fill:#00BCD4,stroke:#006064,color:#fff
+    style ResidentProfiling fill:#F44336,stroke:#B71C1C,color:#fff
+    style ApplicationFlow fill:#009688,stroke:#004D40,color:#fff
+    style QRSystem fill:#795548,stroke:#3E2723,color:#fff
+    style ThemePref fill:#607D8B,stroke:#263238,color:#fff

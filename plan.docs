@@ -1,0 +1,1134 @@
+Here's an enhanced, professional Software Requirements & Development Prompt that you can use as the master blueprint for developing the system.
+
+---
+
+# PROJECT T.R.A.C.E.
+
+## (Transparency • Resilience • Accountability • Community Verification • Economic Growth)
+
+### Complete Software Development Master Prompt
+
+---
+
+# Overview
+
+Develop a **modern full-stack Barangay Management System** called **Project T.R.A.C.E.** using the following technologies:
+
+### Frontend
+
+* HTML5
+* CSS3
+* JavaScript (Vanilla)
+* Bootstrap 5
+* Bootstrap Icons
+* Glassmorphism UI
+* Responsive Design
+* AJAX (without page reload)
+
+### Backend
+
+* PHP 8 (Procedural or MVC-lite)
+* MySQL
+* XAMPP
+
+### Database
+
+* MySQL
+
+### Development Environment
+
+* XAMPP
+
+### Coding Style
+
+* Simple file structure
+* Clean code
+* Modular PHP
+* Reusable components
+* Secure coding practices
+* Prepared Statements
+* Password Hashing
+* Session Authentication
+* Role-Based Access Control (RBAC)
+
+---
+
+# General Objectives
+
+The overall aim of this study is to develop **Project T.R.A.C.E. (Transparency, Resilience, Accountability, Community Verification, and Economic Growth)**, an integrated web-based management system for Barangay Tumalaytay.
+
+The system aims to digitize barangay administrative operations, public service requests, document generation, financial monitoring, project management, community engagement, and resident profiling through QR-based identification and a centralized administrative dashboard.
+
+The project seeks to:
+
+* Digitize barangay records
+* Improve transparency
+* Reduce paperwork
+* Improve service delivery
+* Improve document processing
+* Centralize resident information
+* Digitize project monitoring
+* Enhance disaster preparedness
+* Improve accountability
+* Enable community verification using QR technology
+* Provide real-time reports
+* Improve communication between barangay officials and residents
+* Create a secure, paperless information system
+
+---
+
+# Development Phases
+---
+
+# Simple File Structure
+
+```text
+trace/
+│
+├── assets/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   ├── icons/
+│   └── uploads/
+│
+├── config/
+│   ├── database.php
+│   ├── session.php
+│   └── constants.php
+│
+├── includes/
+│   ├── header.php
+│   ├── navbar.php
+│   ├── sidebar.php
+│   ├── footer.php
+│   ├── functions.php
+│   └── auth.php
+│
+├── admin/
+│   ├── dashboard.php
+│   ├── users.php
+│   ├── officials.php
+│   ├── residents.php
+│   ├── announcements.php
+│   ├── projects.php
+│   ├── budget.php
+│   ├── agenda.php
+│   ├── templates.php
+│   ├── reports.php
+│   ├── settings.php
+│   └── logs.php
+│
+├── secretary/
+│   ├── dashboard.php
+│   ├── residents.php
+│   ├── qr.php
+│   ├── documents.php
+│   ├── projects.php
+│   ├── agenda.php
+│   ├── budget.php
+│   ├── announcements.php
+│   ├── requests.php
+│   └── reports.php
+│
+├── resident/
+│   ├── dashboard.php
+│   ├── profile.php
+│   ├── qr.php
+│   ├── requests.php
+│   ├── appointments.php
+│   ├── announcements.php
+│   ├── notifications.php
+│   └── settings.php
+│
+├── landing/
+│   ├── home.php
+│   ├── about.php
+│   ├── officials.php
+│   ├── services.php
+│   ├── announcements.php
+│   └── contact.php
+│
+├── auth/
+│   ├── login.php
+│   ├── register.php
+│   ├── forgot_password.php
+│   ├── reset_password.php
+│   └── logout.php
+│
+├── database/
+│   └── trace.sql
+│
+├── index.php
+└── README.md
+
+---
+
+# Phase 1
+
+## Planning
+
+### Identify Users
+
+* Administrator
+* Barangay Secretary
+* Resident
+
+### Gather Requirements
+
+Functional
+
+Non-functional
+
+Security
+
+Reports
+
+Notifications
+
+QR System
+
+Document Templates
+
+Printing
+
+Role Permissions
+
+---
+
+# Phase 2
+
+## UI/UX Design
+
+Create a professional Glassmorphism design.
+
+Theme
+
+* White
+* Blue
+* Purple gradient
+* Soft shadows
+* Frosted Glass Cards
+* Rounded Components
+* Smooth Animation
+
+Pages
+
+Landing
+
+Login
+
+Register
+
+Dashboard
+
+Resident Profile
+
+Announcement
+
+Projects
+
+Agenda
+
+Budget
+
+Applications
+
+Reports
+
+Settings
+
+Responsive
+
+Dark Mode (optional)
+
+---
+
+# Phase 3
+
+## Database Design
+
+Main Tables
+
+users
+
+roles
+
+officials
+
+residents
+
+personal_information
+
+documents
+
+applications
+
+application_templates
+
+projects
+
+project_budget
+
+agenda
+
+announcements
+
+notifications
+
+activity_logs
+
+audit_logs
+
+settings
+
+landing_content
+
+gallery
+
+events
+
+disaster_reports
+
+complaints
+
+appointments
+
+households
+
+qr_codes
+
+verification_logs
+
+password_resets
+
+system_logs
+
+---
+
+# Phase 4
+
+## Authentication
+
+Features
+
+Login
+
+Register
+
+Forgot Password
+
+Reset Password
+
+Session Management
+
+Remember Login
+
+Email Ready (future)
+
+Password Hashing
+
+Role Authentication
+
+---
+
+# Phase 5
+
+## Landing Website
+
+Landing page should be dynamic.
+
+Admin can edit:
+
+Hero Section
+
+Mission
+
+Vision
+
+Objectives
+
+Barangay Information
+
+History
+
+Services
+
+Gallery
+
+Announcements
+
+Officials
+
+Contact Information
+
+Map
+
+Footer
+
+Quick Links
+
+News
+
+Statistics
+
+Population
+
+Projects Completed
+
+Certificates Released
+
+Upcoming Events
+
+Emergency Contacts
+
+---
+
+# Landing Sections
+
+Home
+
+About Barangay
+
+Vision
+
+Mission
+
+Officials
+
+Announcements
+
+Projects
+
+Services
+
+Gallery
+
+Events
+
+Contact
+
+Login
+
+Register
+
+---
+
+# Officials Tree
+
+Display organizational hierarchy.
+
+Barangay Captain
+
+↓
+
+Secretary
+
+↓
+
+Treasurer
+
+↓
+
+Councilors
+
+↓
+
+SK Chairman
+
+↓
+
+Tanods
+
+↓
+
+Health Workers
+
+↓
+
+Volunteers
+
+Each official contains
+
+Photo
+
+Name
+
+Position
+
+Term
+
+Contact
+
+Documents contributed
+
+Responsibilities
+
+Achievements
+
+---
+
+# Phase 6
+
+## QR Identification System
+
+Every registered resident automatically receives
+
+Unique QR Code
+
+QR contains
+
+Resident ID
+
+Verification Link
+
+Encrypted ID
+
+QR Features
+
+Download
+
+Print
+
+Verify
+
+Scan
+
+Generate Again
+
+Lost QR Replacement
+
+QR Verification Logs
+
+---
+
+# Phase 7
+
+## Resident Management
+
+Secretary can manage
+
+Personal Information
+
+Resident Profile
+
+Household
+
+Occupation
+
+Education
+
+Civil Status
+
+Birth Information
+
+Senior Citizen
+
+PWD
+
+Voter Status
+
+Emergency Contact
+
+Family Members
+
+Employment
+
+Income Category
+
+Health Information
+
+Religion
+
+Nationality
+
+Blood Type
+
+Photo
+
+Signature
+
+Valid IDs
+
+Supporting Documents
+
+Read-only for Resident
+
+Editable by Secretary/Admin
+
+---
+
+# Phase 8
+
+## Document Management
+
+Secretary can generate
+
+Barangay Clearance
+
+Certificate of Residency
+
+Certificate of Indigency
+
+Business Clearance
+
+First Time Job Seeker
+
+Good Moral
+
+Solo Parent Certificate
+
+Low Income Certificate
+
+Certification
+
+Custom Certificate
+
+All documents
+
+Editable Template
+
+Header
+
+Logo
+
+Signatures
+
+Background
+
+Watermark
+
+QR Verification
+
+Control Number
+
+Auto Numbering
+
+Preview
+
+Print
+
+Download PDF
+
+History
+
+Search
+
+Archive
+
+---
+
+# Phase 9
+
+## Application Request System
+
+Residents can request
+
+Barangay Clearance
+
+Business Clearance
+
+Residency
+
+Appointment
+
+Indigency
+
+Certification
+
+Complaint
+
+Permit
+
+Others
+
+Workflow
+
+Submitted
+
+↓
+
+Pending
+
+↓
+
+Under Review
+
+↓
+
+Approved
+
+↓
+
+Ready for Pickup
+
+↓
+
+Completed
+
+↓
+
+Rejected
+
+Notification
+
+Resident
+
+Secretary
+
+Admin
+
+SMS Ready (future)
+
+Email Ready (future)
+
+---
+
+# Phase 10
+
+## Project Management
+
+Secretary can create
+
+Projects
+
+Project Details
+
+Objectives
+
+Timeline
+
+Status
+
+Category
+
+Location
+
+Budget
+
+Progress
+
+Completion %
+
+Attachments
+
+Gallery
+
+Reports
+
+Admin Approval
+
+---
+
+# Budget Management
+
+Budget Allocation
+
+Expenses
+
+Funding Source
+
+Remaining Budget
+
+Charts
+
+Financial Reports
+
+Download Reports
+
+---
+
+# Agenda Management
+
+Meeting Agenda
+
+Minutes
+
+Schedules
+
+Attendance
+
+Tasks
+
+Deadlines
+
+Attachments
+
+---
+
+# Phase 11
+
+## Announcement System
+
+Secretary creates
+
+Announcements
+
+News
+
+Events
+
+Emergency Alerts
+
+Programs
+
+Meetings
+
+Maintenance
+
+Residents receive
+
+Dashboard Notification
+
+Unread Counter
+
+Archive
+
+Search
+
+Priority Level
+
+Attachments
+
+---
+
+# Phase 12
+
+## Admin Dashboard
+
+Administrator controls everything.
+
+Modules
+
+Dashboard
+
+User Management
+
+Resident Management
+
+Secretary Management
+
+Officials
+
+Landing Page CMS
+
+Projects
+
+Budget
+
+Agenda
+
+Applications
+
+Templates
+
+Announcements
+
+Reports
+
+Activity Logs
+
+Audit Logs
+
+QR Verification
+
+Barangay Settings
+
+Backup
+
+Restore
+
+System Maintenance
+
+Database Management
+
+Security
+
+Analytics
+
+---
+
+Dashboard Analytics
+
+Total Residents
+
+Total Officials
+
+Male/Female
+
+Age Distribution
+
+Pending Requests
+
+Approved Requests
+
+Rejected Requests
+
+Projects
+
+Budget
+
+Revenue
+
+Certificates Released
+
+Announcements
+
+Visitors
+
+QR Scans
+
+Monthly Graphs
+
+Daily Graphs
+
+Yearly Reports
+
+---
+
+# Reports Module
+
+Resident Reports
+
+Project Reports
+
+Financial Reports
+
+Certificate Reports
+
+Application Reports
+
+Attendance Reports
+
+Announcement Reports
+
+Activity Reports
+
+Audit Reports
+
+Export
+
+PDF
+
+Excel
+
+CSV
+
+Print
+
+---
+
+# Audit Logs
+
+Track
+
+Login
+
+Logout
+
+Create
+
+Edit
+
+Delete
+
+Approve
+
+Reject
+
+Print
+
+Download
+
+QR Scan
+
+Timestamp
+
+IP Address
+
+Browser
+
+---
+
+# Backup System
+
+Backup Database
+
+Restore Database
+
+Download Backup
+
+Scheduled Backup
+
+---
+
+# Security
+
+Role Permission
+
+Session Timeout
+
+CSRF Protection
+
+Prepared Statements
+
+Password Hashing
+
+Input Validation
+
+File Validation
+
+Activity Monitoring
+
+---
+
+# Resident Dashboard
+
+Features
+
+View Profile
+
+Download QR
+
+Request Certificates
+
+Track Requests
+
+Appointment Booking
+
+Notifications
+
+Announcements
+
+Download Documents
+
+Settings
+
+Password Change
+
+---
+
+# Secretary Dashboard
+
+Features
+
+Resident Management
+
+QR Management
+
+Document Generator
+
+Projects
+
+Budget
+
+Agenda
+
+Announcements
+
+Application Approval
+
+Reports
+
+---
+
+# Admin Dashboard
+
+Additional Features
+
+Manage Roles
+
+Assign Permissions
+
+Manage Landing Page
+
+Manage Templates
+
+Manage Officials
+
+Manage Users
+
+Manage Database
+
+Manage Settings
+
+System Logs
+
+Analytics
+
+Reports
+
+Backup
+
+Restore
+
+Maintenance Mode
+
+---
+
+# Notifications
+
+Real-time
+
+Application Approved
+
+Rejected
+
+Ready for Pickup
+
+Announcement
+
+Project Updates
+
+Reminder
+
+Agenda
+
+Password Reset
+
+---
+
+# Search Features
+
+Global Search
+
+Residents
+
+Officials
+
+Projects
+
+Applications
+
+Announcements
+
+Documents
+
+Reports
+
+---
+
+# Settings
+
+Barangay Information
+
+Barangay Logo
+
+Officials Signature
+
+System Name
+
+Landing Content
+
+Theme
+
+Maintenance
+
+Email Settings
+
+SMS Ready
+
+Backup
+
+
+
