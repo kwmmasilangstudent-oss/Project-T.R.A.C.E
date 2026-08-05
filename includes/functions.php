@@ -488,17 +488,57 @@ function requireCsrf(): void {
     }
 }
 
-function renderServiceUnavailable(): void {
+function isDebugMode(): bool {
+    return true;
+}
+
+function logServiceUnavailable(?Throwable $exception = null): void {
+    $logDir = __DIR__ . '/../logs';
+    if (!is_dir($logDir)) {
+        @mkdir($logDir, 0755, true);
+    }
+    $errorMessage = '[503] ' . date('Y-m-d H:i:s') . ' ';
+    if ($exception !== null) {
+        $errorMessage .= $exception->getMessage() . ' in ' . $exception->getFile() . ' on line ' . $exception->getLine();
+    }
+    $lastError = error_get_last();
+    if ($lastError !== null) {
+        $errorMessage .= ' | last_error: ' . $lastError['message'] . ' in ' . $lastError['file'] . ' on line ' . $lastError['line'];
+    }
+    $result = @file_put_contents($logDir . '/service_unavailable.log', $errorMessage . PHP_EOL, FILE_APPEND | LOCK_EX);
+    if ($result === false) {
+        @file_put_contents($logDir . '/service_unavailable_failure.log', '[WRITE FAIL] ' . $errorMessage . PHP_EOL, FILE_APPEND | LOCK_EX);
+    }
+}
+
+function renderServiceUnavailable(?Throwable $exception = null): void {
+    logServiceUnavailable($exception);
     while (ob_get_level() > 0) {
         ob_end_clean();
     }
     http_response_code(503);
     $base = defined('BASE_URL') ? BASE_URL : '/';
+    $showDetails = isDebugMode();
+    header('X-Debug-Service-Unavailable: 1');
+    if ($exception !== null) {
+        header('X-Debug-Exception: ' . substr($exception->getMessage(), 0, 200));
+    }
     echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Service Unavailable</title>';
     echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">';
-    echo '<style>body{background:#f8f9fa;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}.card{max-width:480px;border:none;box-shadow:0 4px 24px rgba(0,0,0,.08)}</style>';
+    echo '<style>body{background:#f8f9fa;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}.card{max-width:640px;border:none;box-shadow:0 4px 24px rgba(0,0,0,.08)}</style>';
     echo '</head><body><div class="card p-5 text-center"><h1 class="display-4 text-muted mb-3">503</h1>';
     echo '<p class="lead mb-4">Service is temporarily unavailable. Please try again later.</p>';
+    if ($showDetails) {
+        echo '<div class="text-start bg-white p-3 rounded shadow-sm mb-3"><h5 class="mb-2">Debug details</h5>';
+        if ($exception !== null) {
+            echo '<pre style="white-space: pre-wrap; color: #b91c1c;">' . htmlspecialchars((string) $exception) . '</pre>';
+        }
+        $lastError = error_get_last();
+        if ($lastError !== null) {
+            echo '<pre style="white-space: pre-wrap; color: #6b7280;">Last error: ' . htmlspecialchars($lastError['message'] . ' in ' . $lastError['file'] . ' on line ' . $lastError['line']) . '</pre>';
+        }
+        echo '</div>';
+    }
     echo '<a href="' . $base . '" class="btn btn-primary">Go Home</a></div></body></html>';
     exit;
 }
@@ -535,7 +575,7 @@ set_exception_handler('renderServiceUnavailable');
 register_shutdown_function(function () {
     $err = error_get_last();
     if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
-        renderServiceUnavailable();
+        renderServiceUnavailable(null);
     }
 });
 
