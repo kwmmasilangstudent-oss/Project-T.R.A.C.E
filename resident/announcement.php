@@ -36,7 +36,7 @@ require_once __DIR__ . '/../includes/navbar.php';
 <?php if (!$announcement): ?>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-3 p-0"><?php require_once __DIR__ . '/../includes/sidebar.php'; ?></div>
+            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
             <div class="col-md-9 py-4">
                 <div class="db-card db-reveal db-d4">
                     <div class="db-card-body text-center py-5">

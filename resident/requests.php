@@ -725,9 +725,7 @@ body::after {
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-3 p-0 sr-sidebar-col">
-                <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-            </div>
+            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
             <!-- Main Content -->
             <div class="col-md-9 sr-main-col">

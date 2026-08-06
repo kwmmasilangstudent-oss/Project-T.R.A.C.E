@@ -720,9 +720,7 @@ body {
      ═══════════════════════════════════════ -->
 <div class="st-layout">
     <!-- Sidebar -->
-    <div class="st-sidebar">
-        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-    </div>
+    <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
     <!-- Main -->
     <div class="st-main">

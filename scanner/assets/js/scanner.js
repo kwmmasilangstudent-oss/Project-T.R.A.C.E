@@ -2,7 +2,7 @@
    Project T.R.A.C.E. — QR Scanner Module (Frontend)
    Handles camera scanning, AJAX lookup with autocomplete, feedback.
    ============================================================ */
-(function () {
+(function() {
     'use strict';
 
     var CSRF_TOKEN = window.SCANNER_CFG ? SCANNER_CFG.csrf : '';
@@ -29,7 +29,7 @@
 
     var el = {};
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         cacheEls();
         bindEvents();
         generateCsrf();
@@ -75,31 +75,31 @@
     }
 
     function bindEvents() {
-        el.btnStart.addEventListener('click', function () { startScanner(); });
-        el.btnStop.addEventListener('click', function () { stopScanner(); });
+        el.btnStart.addEventListener('click', function() { startScanner(); });
+        el.btnStop.addEventListener('click', function() { stopScanner(); });
         el.btnSwitch.addEventListener('click', switchCamera);
         el.btnTorch.addEventListener('click', toggleTorch);
         el.btnSens.addEventListener('click', toggleSensitivity);
         el.btnBatch.addEventListener('click', toggleBatch);
         if (el.btnLookupToggle) {
-            el.btnLookupToggle.addEventListener('click', function () {
+            el.btnLookupToggle.addEventListener('click', function() {
                 el.lookupPanel.classList.toggle('open');
-                if (el.lookupPanel.classList.contains('open')) setTimeout(function () { el.lookupInput.focus(); }, 50);
+                if (el.lookupPanel.classList.contains('open')) setTimeout(function() { el.lookupInput.focus(); }, 50);
             });
         }
         el.btnLookupSubmit.addEventListener('click', runLookup);
-        el.lookupInput.addEventListener('input', function () {
+        el.lookupInput.addEventListener('input', function() {
             handleAutocompleteInput();
         });
-        el.lookupInput.addEventListener('keydown', function (e) {
+        el.lookupInput.addEventListener('keydown', function(e) {
             handleAutocompleteKeydown(e);
         });
-        el.lookupInput.addEventListener('focus', function () {
+        el.lookupInput.addEventListener('focus', function() {
             if (el.lookupInput.value.trim().length >= 1) {
                 handleAutocompleteInput();
             }
         });
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             if (!e.target.closest('.sc-autocomplete-wrap')) {
                 hideAutocomplete();
             }
@@ -110,7 +110,7 @@
         el.recentClose.addEventListener('click', closeRecent);
         el.recentBackdrop.addEventListener('click', closeRecent);
         if (el.eventSelect) {
-            el.eventSelect.addEventListener('change', function () {
+            el.eventSelect.addEventListener('change', function() {
                 updateEventCountDisplay();
                 var agendaId = getCurrentAgendaId();
                 if (agendaId) {
@@ -132,7 +132,7 @@
             hideAutocomplete();
             return;
         }
-        autocompleteTimer = setTimeout(function () {
+        autocompleteTimer = setTimeout(function() {
             fetchAutocomplete(term);
         }, 250);
     }
@@ -178,13 +178,13 @@
     function fetchAutocomplete(term) {
         fetch(SEARCH_API + '?q=' + encodeURIComponent(term), {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        }).then(function (r) { return r.json(); }).then(function (data) {
+        }).then(function(r) { return r.json(); }).then(function(data) {
             if (!data.success || !data.residents || !data.residents.length) {
                 hideAutocomplete();
                 return;
             }
             renderAutocomplete(data.residents, term);
-        }).catch(function () {
+        }).catch(function() {
             hideAutocomplete();
         });
     }
@@ -192,7 +192,7 @@
     function renderAutocomplete(residents, term) {
         var html = '';
         var lowerTerm = term.toLowerCase();
-        residents.forEach(function (r, idx) {
+        residents.forEach(function(r, idx) {
             var name = escapeHtml(r.full_name || '');
             var highlighted = highlightMatch(name, lowerTerm);
             var subtitle = r.senior_citizen_id ? escapeHtml(r.senior_citizen_id) : '';
@@ -206,8 +206,8 @@
         activeAutocompleteIndex = -1;
 
         var items = el.autocompleteList.querySelectorAll('.sc-ac-item');
-        Array.prototype.forEach.call(items, function (item) {
-            item.addEventListener('click', function () {
+        Array.prototype.forEach.call(items, function(item) {
+            item.addEventListener('click', function() {
                 var rid = item.getAttribute('data-rid');
                 selectAutocompleteResident(rid);
             });
@@ -254,11 +254,11 @@
         if (!el.eventSelect || !SCANNER_CFG || !SCANNER_CFG.eventsApi) return;
         try {
             fetch(SCANNER_CFG.eventsApi, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
                     if (!data.success || !Array.isArray(data.events)) return;
                     el.eventSelect.innerHTML = '<option value="">No event selected</option>';
-                    data.events.forEach(function (ev) {
+                    data.events.forEach(function(ev) {
                         var opt = document.createElement('option');
                         opt.value = ev.id;
                         var label = ev.title;
@@ -271,13 +271,13 @@
                     });
                     autoSelectEvent(data.events);
                 })
-                .catch(function () { /* ignore */ });
+                .catch(function() { /* ignore */ });
         } catch (e) { /* ignore */ }
     }
 
     function autoSelectEvent(events) {
         if (!el.eventSelect) return;
-        var scannable = events.filter(function (ev) { return ev.is_scannable; });
+        var scannable = events.filter(function(ev) { return ev.is_scannable; });
         var pool = scannable.length ? scannable : events;
         if (pool.length === 1) {
             el.eventSelect.value = pool[0].id;
@@ -320,7 +320,7 @@
     function buildConfig() {
         return {
             fps: sensitivityHigh ? 12 : 10,
-            qrbox: function (vw, vh) {
+            qrbox: function(vw, vh) {
                 var size = Math.min(vw, vh);
                 return { width: Math.floor(size * (sensitivityHigh ? 0.85 : 0.7)), height: Math.floor(size * (sensitivityHigh ? 0.85 : 0.7)) };
             },
@@ -359,7 +359,7 @@
             return;
         }
 
-        html5Qrcode.render(onScanSuccess, function (errMsg) {
+        html5Qrcode.render(onScanSuccess, function(errMsg) {
             var msg = String(errMsg || '');
             if (isNoCodeMessage(msg)) return;
             if (/permission|denied|NotAllowed|no camera|NotFoundError|in use|NotReadable|OverconstrainedError/i.test(msg)) {
@@ -380,13 +380,13 @@
     function stopScanner() {
         if (html5Qrcode) {
             try {
-                html5Qrcode.clear().then(function () {
+                html5Qrcode.clear().then(function() {
                     html5Qrcode = null;
                     running = false;
                     rendered = false;
                     updateControls();
                     setStatus('ready', 'Scanner stopped. Tap Start to scan again.');
-                }).catch(function () {
+                }).catch(function() {
                     html5Qrcode = null;
                     running = false;
                     rendered = false;
@@ -405,7 +405,7 @@
 
     function restartWith() {
         stopScanner();
-        setTimeout(function () { startScanner(); }, 600);
+        setTimeout(function() { startScanner(); }, 600);
     }
 
     function switchCamera() {
@@ -453,7 +453,7 @@
         playBeep();
         vibrate([60, 40, 120]);
 
-        sendScan(decodedText).finally(function () {
+        sendScan(decodedText).finally(function() {
             processing = false;
         });
     }
@@ -471,7 +471,7 @@
         }
         hideAutocomplete();
         el.lookupResults.innerHTML = '<p class="sc-help"><i class="bi bi-arrow-repeat" style="animation:spin 1s linear infinite;"></i> Searching...</p>';
-        fetchPost(LOOKUP_API, { term: term }).then(function (data) {
+        fetchPost(LOOKUP_API, { term: term }).then(function(data) {
             if (!data.success) {
                 el.lookupResults.innerHTML = '<p class="sc-help">' + escapeHtml(data.message) + '</p>';
                 return;
@@ -482,7 +482,7 @@
                 return;
             }
             var html = '<div style="display:flex;flex-direction:column;gap:10px;">';
-            (data.residents || []).forEach(function (r) {
+            (data.residents || []).forEach(function(r) {
                 html += '<button class="sc-btn sc-btn-ghost" style="justify-content:space-between;width:100%;" ' +
                     'data-rid="' + r.id + '"><span>' + escapeHtml(r.full_name) +
                     '</span><span style="font-size:14px;color:#64748b;">' +
@@ -490,14 +490,14 @@
             });
             html += '</div>';
             el.lookupResults.innerHTML = html;
-            Array.prototype.forEach.call(el.lookupResults.querySelectorAll('button[data-rid]'), function (b) {
-                b.addEventListener('click', function () {
+            Array.prototype.forEach.call(el.lookupResults.querySelectorAll('button[data-rid]'), function(b) {
+                b.addEventListener('click', function() {
                     var id = b.getAttribute('data-rid');
                     el.lookupResults.innerHTML = '<p class="sc-help"><i class="bi bi-arrow-repeat" style="animation:spin 1s linear infinite;"></i> Processing scan...</p>';
                     sendScan('resident:' + id);
                 });
             });
-        }).catch(function () {
+        }).catch(function() {
             el.lookupResults.innerHTML = '<p class="sc-help">Lookup failed. Please try again.</p>';
         });
     }
@@ -505,12 +505,12 @@
     /* ── AJAX ── */
     function sendScan(code) {
         var agendaId = getCurrentAgendaId();
-        return fetchPost(SCAN_API, { qr_code: code, csrf_token: CSRF_TOKEN, agenda_id: agendaId }).then(function (data) {
+        return fetchPost(SCAN_API, { qr_code: code, csrf_token: CSRF_TOKEN, agenda_id: agendaId }).then(function(data) {
             if (agendaId && data.agenda_id == agendaId) {
                 updateEventCountDisplay();
             }
             handleScanResponse(data, code);
-        }).catch(function (err) {
+        }).catch(function(err) {
             consecutiveFails++;
             if (err && err.data && typeof err.data === 'object') {
                 handleScanResponse(err.data, code);
@@ -531,7 +531,7 @@
                 showResult(data, true);
                 setStatus('success', 'Verified: ' + (data.resident ? data.resident.full_name : 'Resident'));
                 loadQuickStats();
-                setTimeout(function () {
+                setTimeout(function() {
                     if (running) setStatus('ready', 'Ready — Point camera at QR code');
                 }, 1500);
             } else {
@@ -557,12 +557,12 @@
     }
 
     function fetchPost(url, body) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function(resolve, reject) {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', url, true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            xhr.onreadystatechange = function () {
+            xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4) {
                     var data = null;
                     try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
@@ -576,7 +576,7 @@
                     }
                 }
             };
-            xhr.onerror = function () { reject({ status: 0, message: 'Network error' }); };
+            xhr.onerror = function() { reject({ status: 0, message: 'Network error' }); };
             xhr.send(JSON.stringify(body));
         });
     }
@@ -597,13 +597,13 @@
         var r = data.resident || {};
         var status = data.status || 'not_found';
         var badgeClass = status === 'active' ? 'ok' : (status === 'not_found' ? 'bad' : 'warn');
-        var badgeText = status === 'active' ? 'VERIFIED RESIDENT'
-            : (status === 'expired' ? 'EXPIRED' : (status === 'inactive' ? 'INACTIVE' : 'NOT FOUND'));
+        var badgeText = status === 'active' ? 'VERIFIED RESIDENT' :
+            (status === 'expired' ? 'EXPIRED' : (status === 'inactive' ? 'INACTIVE' : 'NOT FOUND'));
         var badgeIcon = status === 'active' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
 
-        var photo = r.photo_path
-            ? '<img src="' + escapeAttr(r.photo_path) + '" alt="Photo">'
-            : '<i class="bi bi-person-fill"></i>';
+        var photo = r.photo_path ?
+            '<img src="' + escapeAttr(r.photo_path) + '" alt="Photo">' :
+            '<i class="bi bi-person-fill"></i>';
 
         var dob = r.date_of_birth ? formatDate(r.date_of_birth) : '\u2014';
         var age = (r.age !== null && r.age !== undefined) ? r.age : '\u2014';
@@ -620,42 +620,42 @@
         var html =
             '<div class="sc-result-badge ' + badgeClass + '"><i class="bi ' + badgeIcon + '"></i>' + badgeText + '</div>' +
             '<div class="sc-result-body">' +
-                '<div class="sc-result-photo">' + photo + '</div>' +
-                '<div class="sc-result-info">' +
-                    '<h2 class="sc-result-name">' + escapeHtml(r.full_name || 'Unnamed Resident') + '</h2>' +
-                    (r.senior_citizen_id ? '<span class="sc-result-id">SC ID: ' + escapeHtml(r.senior_citizen_id) + '</span>' : '') +
-                    field('bi-cake2', 'Age / Born', age + ' yrs &middot; ' + dob) +
-                    field('bi-geo-alt', 'Address', r.address || '\u2014') +
-                    field('bi-telephone', 'Contact', r.contact_number || '\u2014') +
-                    field('bi-person-vcard', 'Emergency', (r.emergency_contact_name ? escapeHtml(r.emergency_contact_name) : '\u2014') +
-                        (r.emergency_contact_phone ? ' &middot; ' + escapeHtml(r.emergency_contact_phone) : '')) +
-                    field('bi-droplet-fill', 'Blood Type', r.blood_type || '\u2014') +
-                    field('bi-shield-check', 'Status', statusPill) +
-                    medAlert +
-                '</div>' +
+            '<div class="sc-result-photo">' + photo + '</div>' +
+            '<div class="sc-result-info">' +
+            '<h2 class="sc-result-name">' + escapeHtml(r.full_name || 'Unnamed Resident') + '</h2>' +
+            (r.senior_citizen_id ? '<span class="sc-result-id">SC ID: ' + escapeHtml(r.senior_citizen_id) + '</span>' : '') +
+            field('bi-cake2', 'Age / Born', age + ' yrs &middot; ' + dob) +
+            field('bi-geo-alt', 'Address', r.address || '\u2014') +
+            field('bi-telephone', 'Contact', r.contact_number || '\u2014') +
+            field('bi-person-vcard', 'Emergency', (r.emergency_contact_name ? escapeHtml(r.emergency_contact_name) : '\u2014') +
+                (r.emergency_contact_phone ? ' &middot; ' + escapeHtml(r.emergency_contact_phone) : '')) +
+            field('bi-droplet-fill', 'Blood Type', r.blood_type || '\u2014') +
+            field('bi-shield-check', 'Status', statusPill) +
+            medAlert +
+            '</div>' +
             '</div>' +
             '<div class="sc-result-footer">' +
-                '<div class="sc-scan-meta">' +
-                    '<span><i class="bi bi-clock"></i> ' + escapeHtml(data.scanned_at || nowStr()) + '</span>' +
-                    '<span><i class="bi bi-person-badge"></i> ' + escapeHtml(data.scanned_by || 'Official') + '</span>' +
-                '</div>' +
-                (batch ? '' :
-                    '<div class="sc-remarks-wrap">' +
-                        '<label for="remarksInput"><i class="bi bi-pencil"></i> Remarks (optional)</label>' +
-                        '<textarea id="remarksInput" class="sc-remarks" placeholder="e.g. Claimed relief goods, Attended event"></textarea>' +
-                    '</div>') +
-                '<div class="sc-result-buttons">' +
-                    (batch ? '<button class="sc-btn sc-btn-primary" id="btnResume"><i class="bi bi-camera"></i> Continue Scanning</button>'
-                           : '<button class="sc-btn sc-btn-primary" id="btnNext"><i class="bi bi-arrow-right-circle"></i> Scan Next Resident</button>') +
-                    '<button class="sc-btn sc-btn-ghost" id="btnCloseResult"><i class="bi bi-x-circle"></i> Close</button>' +
-                '</div>' +
+            '<div class="sc-scan-meta">' +
+            '<span><i class="bi bi-clock"></i> ' + escapeHtml(data.scanned_at || nowStr()) + '</span>' +
+            '<span><i class="bi bi-person-badge"></i> ' + escapeHtml(data.scanned_by || 'Official') + '</span>' +
+            '</div>' +
+            (batch ? '' :
+                '<div class="sc-remarks-wrap">' +
+                '<label for="remarksInput"><i class="bi bi-pencil"></i> Remarks (optional)</label>' +
+                '<textarea id="remarksInput" class="sc-remarks" placeholder="e.g. Claimed relief goods, Attended event"></textarea>' +
+                '</div>') +
+            '<div class="sc-result-buttons">' +
+            (batch ? '<button class="sc-btn sc-btn-primary" id="btnResume"><i class="bi bi-camera"></i> Continue Scanning</button>' :
+                '<button class="sc-btn sc-btn-primary" id="btnNext"><i class="bi bi-arrow-right-circle"></i> Scan Next Resident</button>') +
+            '<button class="sc-btn sc-btn-ghost" id="btnCloseResult"><i class="bi bi-x-circle"></i> Close</button>' +
+            '</div>' +
             '</div>';
 
         el.modalContent.innerHTML = html;
         el.modal.classList.add('show');
 
         var nextBtn = document.getElementById('btnNext');
-        if (nextBtn) nextBtn.addEventListener('click', function () {
+        if (nextBtn) nextBtn.addEventListener('click', function() {
             var remarks = document.getElementById('remarksInput');
             if (remarks && remarks.value.trim()) {
                 resubmitWithRemarks(data.qr_code, remarks.value.trim());
@@ -664,12 +664,12 @@
             resumeAfterResult();
         });
         var resumeBtn = document.getElementById('btnResume');
-        if (resumeBtn) resumeBtn.addEventListener('click', function () {
+        if (resumeBtn) resumeBtn.addEventListener('click', function() {
             hideModal();
             setStatus('ready', 'Ready \u2014 Point camera at QR code');
         });
         var closeBtn = document.getElementById('btnCloseResult');
-        if (closeBtn) closeBtn.addEventListener('click', function () {
+        if (closeBtn) closeBtn.addEventListener('click', function() {
             hideModal();
             resumeAfterResult();
         });
@@ -686,31 +686,33 @@
 
     function resubmitWithRemarks(code, remarks) {
         var agendaId = getCurrentAgendaId();
-        fetchPost(SCAN_API, { qr_code: code, remarks: remarks, csrf_token: CSRF_TOKEN, agenda_id: agendaId }).catch(function () {});
+        fetchPost(SCAN_API, { qr_code: code, remarks: remarks, csrf_token: CSRF_TOKEN, agenda_id: agendaId }).catch(function() {});
     }
 
     function showNotFound(data, code) {
         var html =
             '<div class="sc-result-badge bad"><i class="bi bi-exclamation-triangle-fill"></i> NOT FOUND</div>' +
             '<div class="sc-result-body" style="flex-direction:column;">' +
-                '<p style="font-size:19px;color:#334155;line-height:1.6;margin:0;">' +
-                escapeHtml(data.message || 'QR Code not recognized. Please verify manually or register this resident.') + '</p>' +
-                '<p style="font-size:15px;color:#64748b;margin:8px 0 0;">Code scanned: <code>' + escapeHtml(code) + '</code></p>' +
+            '<p style="font-size:19px;color:#334155;line-height:1.6;margin:0;">' +
+            escapeHtml(data.message || 'QR Code not recognized. Please verify manually or register this resident.') + '</p>' +
+            '<p style="font-size:15px;color:#64748b;margin:8px 0 0;">Code scanned: <code>' + escapeHtml(code) + '</code></p>' +
             '</div>' +
             '<div class="sc-result-footer">' +
-                '<div class="sc-result-buttons">' +
-                    '<button class="sc-btn sc-btn-primary" id="btnNext"><i class="bi bi-arrow-right-circle"></i> Scan Next Resident</button>' +
-                    '<button class="sc-btn sc-btn-ghost" id="btnCloseResult"><i class="bi bi-x-circle"></i> Close</button>' +
-                '</div>' +
+            '<div class="sc-result-buttons">' +
+            '<button class="sc-btn sc-btn-primary" id="btnNext"><i class="bi bi-arrow-right-circle"></i> Scan Next Resident</button>' +
+            '<button class="sc-btn sc-btn-ghost" id="btnCloseResult"><i class="bi bi-x-circle"></i> Close</button>' +
+            '</div>' +
             '</div>';
 
         el.modalContent.innerHTML = html;
         el.modal.classList.add('show');
 
         var nb = document.getElementById('btnNext');
-        if (nb) nb.addEventListener('click', function () { hideModal(); resumeAfterResult(); });
+        if (nb) nb.addEventListener('click', function() { hideModal();
+            resumeAfterResult(); });
         var cb = document.getElementById('btnCloseResult');
-        if (cb) cb.addEventListener('click', function () { hideModal(); resumeAfterResult(); });
+        if (cb) cb.addEventListener('click', function() { hideModal();
+            resumeAfterResult(); });
     }
 
     function field(icon, label, value) {
@@ -743,11 +745,11 @@
             return;
         }
         var html = '';
-        recentScans.forEach(function (s) {
-            var cls = s.status === 'active' || s.status === 'success' ? 'ok'
-                : (s.status === 'not_found' ? 'bad' : 'warn');
-            var label = s.status === 'active' || s.status === 'success' ? 'VERIFIED'
-                : (s.status === 'not_found' ? 'NOT FOUND' : s.status.toUpperCase());
+        recentScans.forEach(function(s) {
+            var cls = s.status === 'active' || s.status === 'success' ? 'ok' :
+                (s.status === 'not_found' ? 'bad' : 'warn');
+            var label = s.status === 'active' || s.status === 'success' ? 'VERIFIED' :
+                (s.status === 'not_found' ? 'NOT FOUND' : s.status.toUpperCase());
             html += '<div class="sc-recent-item">' +
                 '<div class="ri-name">' + escapeHtml(s.name) + '</div>' +
                 '<div class="ri-sub"><span class="ri-tag ' + cls + '">' + label + '</span>' +
@@ -760,6 +762,7 @@
         el.recentDrawer.classList.add('open');
         el.recentBackdrop.classList.add('show');
     }
+
     function closeRecent() {
         el.recentDrawer.classList.remove('open');
         el.recentBackdrop.classList.remove('show');
@@ -768,15 +771,16 @@
     /* ── Quick stats ── */
     function loadQuickStats() {
         fetch('api/scan_stats.php', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(function (r) { return r.json(); })
-            .then(function (d) {
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
                 if (!d.success) return;
                 setStat(el.stats.total, d.stats.total);
                 setStat(el.stats.ok, d.stats.success);
                 setStat(el.stats.notfound, d.stats.not_found);
                 setStat(el.stats.inactive, d.stats.inactive);
-            }).catch(function () {});
+            }).catch(function() {});
     }
+
     function setStat(node, val) {
         if (node) node.textContent = val;
     }
@@ -786,29 +790,34 @@
         try {
             var a = new Audio(window.SCANNER_CFG ? SCANNER_CFG.beepSrc : 'assets/audio/beep.wav');
             a.volume = 0.7;
-            a.play().catch(function () { beepTone(880, 0.14); });
+            a.play().catch(function() { beepTone(880, 0.14); });
         } catch (e) { beepTone(880, 0.14); }
     }
+
     function playError() {
         try {
             var a = new Audio(window.SCANNER_CFG ? SCANNER_CFG.errorSrc : 'assets/audio/error.wav');
             a.volume = 0.7;
-            a.play().catch(function () { beepTone(220, 0.32); });
+            a.play().catch(function() { beepTone(220, 0.32); });
         } catch (e) { beepTone(220, 0.32); }
     }
+
     function beepTone(freq, dur) {
         try {
-            var ctx = new (window.AudioContext || window.webkitAudioContext)();
+            var ctx = new(window.AudioContext || window.webkitAudioContext)();
             var osc = ctx.createOscillator();
             var gain = ctx.createGain();
             osc.frequency.value = freq;
             osc.type = 'sine';
             gain.gain.setValueAtAtime(0.5, ctx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.start(); osc.stop(ctx.currentTime + dur);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + dur);
         } catch (e) { /* ignore */ }
     }
+
     function vibrate(pattern) {
         if (navigator.vibrate) {
             try { navigator.vibrate(pattern); } catch (e) {}
@@ -820,8 +829,8 @@
         el.status.className = 'sc-status ' + kind;
         el.status.innerHTML = '<i class="bi ' +
             (kind === 'success' ? 'bi-check-circle-fill' :
-             kind === 'error' ? 'bi-x-circle-fill' :
-             kind === 'processing' ? 'bi-arrow-repeat' : 'bi-camera') + '"></i>' + escapeHtml(text);
+                kind === 'error' ? 'bi-x-circle-fill' :
+                kind === 'processing' ? 'bi-arrow-repeat' : 'bi-camera') + '"></i>' + escapeHtml(text);
     }
 
     function updateControls() {
@@ -838,15 +847,18 @@
             return dt.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
         } catch (e) { return escapeHtml(d); }
     }
+
     function nowStr() {
         try { return new Date().toLocaleString(); } catch (e) { return ''; }
     }
+
     function escapeHtml(s) {
         if (s === null || s === undefined) return '';
-        return String(s).replace(/[&<>"']/g, function (c) {
+        return String(s).replace(/[&<>"']/g, function(c) {
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
         });
     }
+
     function escapeAttr(s) {
         return escapeHtml(s).replace(/`/g, '&#96;');
     }

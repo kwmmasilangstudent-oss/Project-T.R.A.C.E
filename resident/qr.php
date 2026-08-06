@@ -816,9 +816,9 @@
         <div class="container-fluid">
             <div class="row">
                 <!-- Sidebar -->
-                <div class="col-md-3 p-0 qr-sidebar-col">
+        
                     <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-                </div>
+              
 
                 <!-- Main Content -->
                 <div class="col-md-9 qr-main-col">

@@ -19,7 +19,7 @@ function isLoggedIn(): bool {
 }
 
 function enforceSessionTimeout(): void {
-    $limit = 30 * 60;
+    $limit = 20;
     $now = time();
     if (!empty($_SESSION['last_activity']) && ($now - (int) $_SESSION['last_activity']) > $limit) {
         session_unset();

@@ -913,10 +913,7 @@ body::after {
 <div class="ap-page-wrapper">
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 p-0 ap-sidebar-col">
-                <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-            </div>
+            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
             <!-- Main Content -->
             <div class="col-md-9 ap-main-col">
@@ -936,45 +933,7 @@ body::after {
                     <div class="ap-page-divider"></div>
                 </div>
 
-                <!-- ── Stats Row ── -->
-                <div class="ap-stats-row ap-reveal ap-d2">
-                    <div class="ap-stat-pill">
-                        <div class="ap-pill-icon" style="background:rgba(16,185,129,0.10); color:#6ee7b7;">
-                            <i class="bi bi-calendar-event"></i>
-                        </div>
-                        <div>
-                            <div class="ap-pill-value"><?php echo $statTotal; ?></div>
-                            <div class="ap-pill-label">Total</div>
-                        </div>
-                    </div>
-                    <div class="ap-stat-pill">
-                        <div class="ap-pill-icon" style="background:rgba(245,158,11,0.10); color:#fcd34d;">
-                            <i class="bi bi-clock"></i>
-                        </div>
-                        <div>
-                            <div class="ap-pill-value"><?php echo $statPending; ?></div>
-                            <div class="ap-pill-label">Pending</div>
-                        </div>
-                    </div>
-                    <div class="ap-stat-pill">
-                        <div class="ap-pill-icon" style="background:rgba(14,165,233,0.10); color:#7dd3fc;">
-                            <i class="bi bi-check-circle"></i>
-                        </div>
-                        <div>
-                            <div class="ap-pill-value"><?php echo $statApproved; ?></div>
-                            <div class="ap-pill-label">Approved</div>
-                        </div>
-                    </div>
-                    <div class="ap-stat-pill">
-                        <div class="ap-pill-icon" style="background:rgba(139,92,246,0.10); color:#c4b5fd;">
-                            <i class="bi bi-check2-all"></i>
-                        </div>
-                        <div>
-                            <div class="ap-pill-value"><?php echo $statCompleted; ?></div>
-                            <div class="ap-pill-label">Completed</div>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <!-- ── Alerts ── -->
                 <?php if (!empty($success)): ?>
