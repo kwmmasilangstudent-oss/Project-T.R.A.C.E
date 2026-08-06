@@ -680,11 +680,7 @@ body {
     <div class="pj-orb o3"></div>
 
     <div class="pj-layout">
-        <!-- Sidebar -->
-        <div class="pj-sidebar">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
-
+       <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
         <!-- Main -->
         <div class="pj-main">
 

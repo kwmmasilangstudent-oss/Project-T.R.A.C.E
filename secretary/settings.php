@@ -700,10 +700,7 @@ body {
     <div class="sg-orb o3"></div>
 
     <div class="sg-layout">
-        <!-- Sidebar -->
-        <div class="sg-sidebar">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
         <!-- Main -->
         <div class="sg-main">
@@ -716,7 +713,7 @@ body {
                         Account
                     </div>
                     <h1 class="sg-title">My <span>Settings</span></h1>
-                    <p class="sg-desc">Manage your profile, security preferences, and notification settings.</p>
+                    <p class="sg-desc">Manage your profile and security settings.</p>
                 </div>
             </div>
 
@@ -796,34 +793,7 @@ body {
                         </div>
                     </div>
 
-                    <!-- Preferences -->
-                    <div class="sg-section">
-                        <i class="bi bi-sliders"></i>
-                        <span>Preferences</span>
-                    </div>
-
-                    <div class="sg-fg sg-fg-3">
-                        <div>
-                            <label class="sg-label" style="margin-bottom:12px;"><i class="bi bi-bell"></i> Notifications</label>
-                            <div class="sg-toggle-wrap">
-                                <div class="sg-toggle-icon" style="background:rgba(14,165,233,0.12); color:#0ea5e9;">
-                                    <i class="bi bi-envelope"></i>
-                                </div>
-                                <input type="checkbox" name="email_notifications" class="sg-toggle" id="sgEmailNotif" <?php echo $emailNotif === '1' ? 'checked' : ''; ?>>
-                                <label class="sg-toggle-text" for="sgEmailNotif">Email Alerts</label>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="sg-label" style="margin-bottom:12px;"><i class="bi bi-phone"></i> Mobile</label>
-                            <div class="sg-toggle-wrap">
-                                <div class="sg-toggle-icon" style="background:rgba(16,185,129,0.12); color:#10b981;">
-                                    <i class="bi bi-chat-dots"></i>
-                                </div>
-                                <input type="checkbox" name="sms_notifications" class="sg-toggle" id="sgSmsNotif" <?php echo $smsNotif === '1' ? 'checked' : ''; ?>>
-                                <label class="sg-toggle-text" for="sgSmsNotif">SMS Alerts</label>
-                            </div>
-                        </div>
-                    </div>
+                   
 
                     <!-- Save -->
                     <div class="sg-actions">

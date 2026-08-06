@@ -850,10 +850,7 @@ body {
     <div class="an-orb o3"></div>
 
     <div class="an-layout">
-        <!-- Sidebar -->
-        <div class="an-sidebar-col">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
         <!-- Main -->
         <div class="an-main-col">

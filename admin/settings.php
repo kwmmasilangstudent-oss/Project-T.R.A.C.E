@@ -74,7 +74,7 @@ require_once __DIR__ . '/../includes/navbar.php';
             <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
                 <div>
                     <h3 class="mb-1">System Settings</h3>
-                    <p class="text-muted-glass mb-0">Manage barangay information, appearance, notifications, and system preferences.</p>
+                    <p class="text-muted-glass mb-0">Manage barangay information and appearance.</p>
                 </div>
             </div>
 
@@ -138,22 +138,7 @@ require_once __DIR__ . '/../includes/navbar.php';
                     </div>
                 </div>
 
-                <!-- System Preferences -->
-                <div class="glass-card p-3 p-md-4 mb-4">
-                    <h5 class="mb-3" style="font-family:var(--font-display);font-weight:700;">
-                        <i class="bi bi-gear me-2"></i>System Preferences
-                    </h5>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <div class="form-check form-switch mt-4">
-                                <input class="form-check-input" type="checkbox" name="maintenance_mode"
-                                       id="maintenance_mode"
-                                       <?php echo ($settings['maintenance_mode'] ?? '0') === '1' ? 'checked' : ''; ?>>
-                                <label class="form-check-label" for="maintenance_mode">Maintenance Mode</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <!-- Save Button -->
                 <div class="d-flex justify-content-end mb-4">

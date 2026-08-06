@@ -728,11 +728,7 @@ body {
     <div class="ds-orb o3"></div>
 
     <div class="ds-layout">
-        <!-- Sidebar -->
-        <div class="ds-sidebar">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
-
+        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
         <!-- Main -->
         <div class="ds-main">
 

@@ -735,10 +735,7 @@ body {
     <div class="dc-orb o3"></div>
 
     <div class="dc-layout">
-        <!-- Sidebar -->
-        <div class="dc-sidebar">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
         <!-- Main -->
         <div class="dc-main">

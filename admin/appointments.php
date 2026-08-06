@@ -683,9 +683,9 @@ body {
     <div class="rq-orb o3"></div>
 
     <div class="rq-layout">
-        <div class="rq-sidebar">
+        
             <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        
 
         <div class="rq-main">
 

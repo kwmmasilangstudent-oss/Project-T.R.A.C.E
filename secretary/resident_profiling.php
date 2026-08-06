@@ -253,9 +253,9 @@ function fmtPcn($v) {
 ?>
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 p-0">
+        
             <?php require_once __DIR__ . "/../includes/sidebar.php"; ?>
-        </div>
+        
         <div class="col-md-9 py-4 px-3 px-md-4">
             <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
                 <div>

@@ -857,43 +857,9 @@ body {
                     </div>
                 </form>
 
-                <!-- Preferences -->
-                <div class="st-section">
-                    <i class="bi bi-sliders"></i>
-                    <span>Preferences</span>
-                </div>
+                
+                
 
-                <div class="st-fg st-fg-3">
-                    <div>
-                        <label class="st-label" style="margin-bottom:12px;"><i class="bi bi-bell"></i> Notifications</label>
-                        <div class="st-toggle-wrap">
-                            <div class="st-toggle-icon" style="background:rgba(14,165,233,0.12); color:#0ea5e9;">
-                                <i class="bi bi-envelope"></i>
-                            </div>
-                            <input type="checkbox" name="email_notifications" class="st-toggle" id="stEmailNotif" <?php echo $emailNotif === '1' ? 'checked' : ''; ?>>
-                            <label class="st-toggle-text" for="stEmailNotif">Email Alerts</label>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="st-label" style="margin-bottom:12px;"><i class="bi bi-phone"></i> Mobile</label>
-                        <div class="st-toggle-wrap">
-                            <div class="st-toggle-icon" style="background:rgba(16,185,129,0.12); color:#10b981;">
-                                <i class="bi bi-chat-dots"></i>
-                            </div>
-                            <input type="checkbox" name="sms_notifications" class="st-toggle" id="stSmsNotif" <?php echo $smsNotif === '1' ? 'checked' : ''; ?>>
-                            <label class="st-toggle-text" for="stSmsNotif">SMS Alerts</label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Save -->
-                <div class="st-actions">
-                    <button type="submit" class="st-btn st-btn-primary">
-                        <i class="bi bi-check-lg"></i>
-                        <span>Save Settings</span>
-                    </button>
-                </div>
-            </form>
 
             <!-- Danger Zone -->
             <div class="st-section">

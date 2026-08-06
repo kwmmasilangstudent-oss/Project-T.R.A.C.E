@@ -681,15 +681,7 @@ body {
                     <p>Apply for barangay clearance, residency, and other documents online.</p>
                 </div>
             </div>
-            <div class="lg-feature-item lg-reveal lg-d5">
-                <div class="lg-feature-icon" style="background:rgba(245,158,11,0.12); color:#f59e0b;">
-                    <i class="bi bi-bell"></i>
-                </div>
-                <div class="lg-feature-text">
-                    <h6>Real-time Notifications</h6>
-                    <p>Get notified when your requests are approved, ready, or need attention.</p>
-                </div>
-            </div>
+           
             <div class="lg-feature-item lg-reveal lg-d6">
                 <div class="lg-feature-icon" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">
                     <i class="bi bi-shield-lock"></i>
@@ -703,20 +695,7 @@ body {
 
         <div class="lg-left-divider lg-reveal lg-d7"></div>
 
-        <div class="lg-left-stats lg-reveal lg-d8">
-            <div>
-                <div class="lg-left-stat-val" style="color:var(--lg-accent);">256-bit</div>
-                <div class="lg-left-stat-label">Encryption</div>
-            </div>
-            <div>
-                <div class="lg-left-stat-val" style="color:var(--lg-violet);">24/7</div>
-                <div class="lg-left-stat-label">Access</div>
-            </div>
-            <div>
-                <div class="lg-left-stat-val" style="color:var(--lg-amber);">100%</div>
-                <div class="lg-left-stat-label">Transparency</div>
-            </div>
-        </div>
+        
     </div>
 
     <!-- ── RIGHT: Login Form ── -->

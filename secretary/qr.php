@@ -619,9 +619,9 @@ body {
 
     <div class="qr-layout">
         <!-- Sidebar -->
-        <div class="qr-sidebar">
+       
             <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+       
 
         <!-- Main -->
         <div class="qr-main">

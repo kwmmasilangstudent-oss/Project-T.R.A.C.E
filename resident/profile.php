@@ -94,7 +94,7 @@ if ($resident) {
 
 $recentAnnouncements = [];
 if ($resident) {
-    $stmt = $pdo->prepare('SELECT a.title, a.type, a.priority, a.created_at, ar.is_read FROM announcements a JOIN announcement_reads ar ON ar.announcement_id = a.id WHERE a.is_active = 1 AND ar.resident_id = ? ORDER BY a.created_at DESC LIMIT 5');
+    $stmt = $pdo->prepare('SELECT a.id, a.title, a.type, a.priority, a.created_at, ar.is_read FROM announcements a JOIN announcement_reads ar ON ar.announcement_id = a.id WHERE a.is_active = 1 AND ar.resident_id = ? ORDER BY a.created_at DESC LIMIT 5');
     $stmt->execute([$resident['id']]);
     $recentAnnouncements = $stmt->fetchAll();
 }

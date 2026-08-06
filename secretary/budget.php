@@ -797,10 +797,7 @@ body {
     <div class="bg-orb o3"></div>
 
     <div class="bg-layout">
-        <!-- Sidebar -->
-        <div class="bg-sidebar">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
 
         <!-- Main -->
         <div class="bg-main">
