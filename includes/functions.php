@@ -326,9 +326,9 @@ function createNotification(int $userId, string $message, ?string $link = null, 
     try {
         $pdo = getDbConnection();
         $stmt = $pdo->prepare('INSERT INTO notifications (user_id, message, link, created_by) VALUES (?, ?, ?, ?)');
-        $stmt->execute([$userId, $message, $link, $createdBy]);
+        $stmt->execute([(int)$userId, (string)$message, $link, $createdBy]);
     } catch (Throwable $e) {
-        // Silent fail
+        error_log('Notification creation failed: ' . $e->getMessage());
     }
 }
 
@@ -440,8 +440,12 @@ function getThemeForCurrentRole(string $default = 'light'): string {
     return getSetting($key, $default);
 }
 
+function csrfToken(): string {
+    return $_SESSION['_csrf_token'] ?? '';
+}
+
 function csrfField(): string {
-    $token = $_SESSION['_csrf_token'] ?? '';
+    $token = csrfToken();
     return '<input type="hidden" name="_csrf_token" value="' . $token . '">';
 }
 

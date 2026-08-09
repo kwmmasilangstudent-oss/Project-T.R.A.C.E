@@ -93,6 +93,7 @@ $stats = $pdo->query('SELECT
 
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/navbar.php';
+require_once __DIR__ . '/../includes/confirmation-modal.php';
 ?>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -827,31 +828,29 @@ body {
                                         </td>
                                         <td><span class="rq-cell-date"><?php echo date('M d, Y', strtotime($appt['created_at'])); ?></span></td>
                                         <td>
-                                            <form method="post" class="rq-actions-cell">
-                                                <?php echo csrfField(); ?>
-                                                <input type="hidden" name="appointment_id" value="<?php echo (int) $appt['id']; ?>">
+                                            <div class="rq-actions-cell" data-csrf="<?php echo csrfToken(); ?>">
                                                 <?php if ($appt['status'] === 'pending'): ?>
-                                                    <button type="submit" name="action" value="approve" class="rq-act rq-act-approve">
+                                                    <button type="button" class="rq-act rq-act-approve" data-appointment-id="<?php echo (int) $appt['id']; ?>" data-action="approve">
                                                         <i class="bi bi-check-lg"></i> Approve
                                                     </button>
-                                                    <button type="submit" name="action" value="reject" class="rq-act rq-act-reject">
+                                                    <button type="button" class="rq-act rq-act-reject" data-appointment-id="<?php echo (int) $appt['id']; ?>" data-action="reject">
                                                         <i class="bi bi-x-lg"></i> Reject
                                                     </button>
                                                 <?php endif; ?>
                                                 <?php if ($appt['status'] === 'approved'): ?>
-                                                    <button type="submit" name="action" value="complete" class="rq-act rq-act-complete">
+                                                    <button type="button" class="rq-act rq-act-complete" data-appointment-id="<?php echo (int) $appt['id']; ?>" data-action="complete">
                                                         <i class="bi bi-check-all"></i> Complete
                                                     </button>
-                                                    <button type="submit" name="action" value="cancel" class="rq-act rq-act-cancel">
+                                                    <button type="button" class="rq-act rq-act-cancel" data-appointment-id="<?php echo (int) $appt['id']; ?>" data-action="cancel">
                                                         <i class="bi bi-x-lg"></i> Cancel
                                                     </button>
                                                 <?php endif; ?>
                                                 <?php if ($appt['status'] === 'rejected'): ?>
-                                                    <button type="submit" name="action" value="pending" class="rq-act rq-act-pending">
+                                                    <button type="button" class="rq-act rq-act-pending" data-appointment-id="<?php echo (int) $appt['id']; ?>" data-action="pending">
                                                         <i class="bi bi-arrow-counterclockwise"></i> Pending
                                                     </button>
                                                 <?php endif; ?>
-                                            </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -874,6 +873,21 @@ body {
 </div>
 
 <script>
+var appointmentModalData = {
+    appointmentId: null,
+    action: null,
+    button: null,
+    csrfToken: null
+};
+
+var confirmMessages = {
+    approve: 'Approve this appointment? The resident will be notified.',
+    reject: 'Reject this appointment? The resident will be notified.',
+    complete: 'Mark this appointment as complete?',
+    cancel: 'Cancel this appointment? The resident will be notified.',
+    pending: 'Move this appointment back to pending status?'
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     var reveals = document.querySelectorAll('.rq-reveal');
     setTimeout(function() {
@@ -881,7 +895,116 @@ document.addEventListener('DOMContentLoaded', function() {
             el.classList.add('rq-vis');
         });
     }, 80);
+    
+    var actionButtons = document.querySelectorAll('.rq-act');
+    actionButtons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            var appointmentId = this.dataset.appointmentId;
+            var action = this.dataset.action;
+            var csrfToken = this.closest('.rq-actions-cell').dataset.csrf;
+            
+            if (!appointmentId || !action) return;
+            
+            appointmentModalData.appointmentId = appointmentId;
+            appointmentModalData.action = action;
+            appointmentModalData.button = this;
+            appointmentModalData.csrfToken = csrfToken;
+            
+            var confirmMessage = confirmMessages[action] || 'Are you sure?';
+            document.getElementById('confirmMessage').textContent = confirmMessage;
+            
+            var modal = new bootstrap.Modal(document.getElementById('actionConfirmModal'));
+            modal.show();
+        });
+    });
+    
+    document.getElementById('confirmActionBtn').addEventListener('click', function() {
+        performAppointmentAction();
+    });
 });
+
+function performAppointmentAction() {
+    var data = appointmentModalData;
+    var btn = data.button;
+    
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    var originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    
+    var formData = new FormData();
+    formData.append('appointment_id', data.appointmentId);
+    formData.append('action', data.action);
+    formData.append('csrf_token', data.csrfToken);
+    
+    fetch('/admin/api/appointments-action.php', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+        }
+        
+        var contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            return response.text().then(text => {
+                throw new Error('Invalid response format. Expected JSON, got: ' + contentType + '. Response: ' + text.substring(0, 100));
+            });
+        }
+        
+        return response.json();
+    })
+    .then(result => {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('actionConfirmModal'));
+        if (modal) modal.hide();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(function() {
+                location.reload();
+            }, 1500);
+        } else {
+            showToast(result.message || 'An error occurred', 'error');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.innerHTML = originalHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Appointment action error:', error);
+        showToast('Error: ' + error.message, 'error');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.innerHTML = originalHtml;
+    });
+}
+
+function showToast(message, type) {
+    var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    var alertHtml = '<div class="alert ' + alertClass + ' alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
+        message +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>';
+    
+    var alertDiv = document.createElement('div');
+    alertDiv.innerHTML = alertHtml;
+    document.body.appendChild(alertDiv.firstElementChild);
+    
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(a) {
+            if (a.style.position === 'fixed') {
+                a.remove();
+            }
+        });
+    }, 4000);
+}
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

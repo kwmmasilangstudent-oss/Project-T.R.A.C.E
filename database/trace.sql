@@ -183,6 +183,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     message TEXT NOT NULL,
     is_read TINYINT(1) DEFAULT 0,
     link TEXT NULL,
+    created_by INT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
