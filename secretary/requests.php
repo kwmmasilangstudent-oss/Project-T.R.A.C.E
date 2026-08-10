@@ -104,6 +104,7 @@ $stats = $pdo->query($statsQuery)->fetch();
 
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/navbar.php';
+require_once __DIR__ . '/../includes/confirmation-modal.php';
 ?>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -933,38 +934,36 @@ body {
                                         </td>
                                         <td><span class="rq-cell-date"><?php echo date('M d, Y', strtotime($app['created_at'])); ?></span></td>
                                         <td>
-                                            <form method="post" class="rq-actions-cell">
-                                                <?php echo csrfField(); ?>
-                                                <input type="hidden" name="application_id" value="<?php echo (int) $app['id']; ?>">
+                                            <div class="rq-actions-cell" data-csrf="<?php echo csrfToken(); ?>">
                                                 <?php if (in_array($app['status'], ['submitted', 'pending'])): ?>
-                                                    <button type="submit" name="action" value="review" class="rq-act rq-act-review">
+                                                    <button type="button" class="rq-act rq-act-review" data-application-id="<?php echo (int) $app['id']; ?>" data-action="review">
                                                         <i class="bi bi-eye"></i> Review
                                                     </button>
                                                 <?php endif; ?>
                                                 <?php if ($app['status'] === 'under_review'): ?>
-                                                    <button type="submit" name="action" value="approve" class="rq-act rq-act-approve">
+                                                    <button type="button" class="rq-act rq-act-approve" data-application-id="<?php echo (int) $app['id']; ?>" data-action="approve">
                                                         <i class="bi bi-check-lg"></i> Approve
                                                     </button>
-                                                    <button type="submit" name="action" value="reject" class="rq-act rq-act-reject">
+                                                    <button type="button" class="rq-act rq-act-reject" data-application-id="<?php echo (int) $app['id']; ?>" data-action="reject">
                                                         <i class="bi bi-x-lg"></i> Reject
                                                     </button>
                                                 <?php endif; ?>
                                                 <?php if ($app['status'] === 'approved'): ?>
-                                                    <button type="submit" name="action" value="ready" class="rq-act rq-act-ready">
+                                                    <button type="button" class="rq-act rq-act-ready" data-application-id="<?php echo (int) $app['id']; ?>" data-action="ready">
                                                         <i class="bi bi-bag-check"></i> Ready
                                                     </button>
                                                 <?php endif; ?>
                                                 <?php if ($app['status'] === 'ready_for_pickup'): ?>
-                                                    <button type="submit" name="action" value="complete" class="rq-act rq-act-complete">
+                                                    <button type="button" class="rq-act rq-act-complete" data-application-id="<?php echo (int) $app['id']; ?>" data-action="complete">
                                                         <i class="bi bi-check-all"></i> Complete
                                                     </button>
                                                 <?php endif; ?>
                                                 <?php if ($app['status'] === 'rejected'): ?>
-                                                    <button type="submit" name="action" value="pending" class="rq-act rq-act-pending">
+                                                    <button type="button" class="rq-act rq-act-pending" data-application-id="<?php echo (int) $app['id']; ?>" data-action="pending">
                                                         <i class="bi bi-arrow-counterclockwise"></i> Pending
                                                     </button>
                                                 <?php endif; ?>
-                                            </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -990,14 +989,139 @@ body {
 
 <!-- Scripts -->
 <script>
+var applicationModalData = {
+    applicationId: null,
+    action: null,
+    button: null,
+    csrfToken: null
+};
+
+var confirmMessages = {
+    review: 'Mark this application as under review? The resident will be notified.',
+    approve: 'Approve this application? The resident will be notified.',
+    reject: 'Reject this application? The resident will be notified.',
+    ready: 'Mark this application as ready for pickup? The resident will be notified.',
+    complete: 'Mark this application as complete? The resident will be notified.',
+    pending: 'Move this application back to pending status?'
+};
+
 document.addEventListener('DOMContentLoaded', function() {
-    var reveals = document.querySelectorAll('.rq-reveal');
+    var reveals = document.querySelectorAll('.sr-reveal');
     setTimeout(function() {
         reveals.forEach(function(el) {
-            el.classList.add('rq-vis');
+            el.classList.add('sr-visible');
         });
-    }, 60);
+    }, 80);
+    
+    var actionButtons = document.querySelectorAll('.rq-act');
+    actionButtons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            var applicationId = this.dataset.applicationId;
+            var action = this.dataset.action;
+            var csrfToken = this.closest('.rq-actions-cell').dataset.csrf;
+            
+            if (!applicationId || !action) return;
+            
+            applicationModalData.applicationId = applicationId;
+            applicationModalData.action = action;
+            applicationModalData.button = this;
+            applicationModalData.csrfToken = csrfToken;
+            
+            var confirmMessage = confirmMessages[action] || 'Are you sure?';
+            document.getElementById('confirmMessage').textContent = confirmMessage;
+            
+            var modal = new bootstrap.Modal(document.getElementById('actionConfirmModal'));
+            modal.show();
+        });
+    });
+    
+    document.getElementById('confirmActionBtn').addEventListener('click', function() {
+        performApplicationAction();
+    });
 });
+
+function performApplicationAction() {
+    var data = applicationModalData;
+    var btn = data.button;
+    
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    var originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    
+    var formData = new FormData();
+    formData.append('application_id', data.applicationId);
+    formData.append('action', data.action);
+    formData.append('csrf_token', data.csrfToken);
+    
+    fetch('/secretary/api/applications-action.php', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+        }
+        
+        var contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            return response.text().then(text => {
+                throw new Error('Invalid response format. Expected JSON, got: ' + contentType + '. Response: ' + text.substring(0, 100));
+            });
+        }
+        
+        return response.json();
+    })
+    .then(result => {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('actionConfirmModal'));
+        if (modal) modal.hide();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(function() {
+                location.reload();
+            }, 1500);
+        } else {
+            showToast(result.message || 'An error occurred', 'error');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.innerHTML = originalHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Application action error:', error);
+        showToast('Error: ' + error.message, 'error');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.innerHTML = originalHtml;
+    });
+}
+
+function showToast(message, type) {
+    var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    var alertHtml = '<div class="alert ' + alertClass + ' alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
+        message +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>';
+    
+    var alertDiv = document.createElement('div');
+    alertDiv.innerHTML = alertHtml;
+    document.body.appendChild(alertDiv.firstElementChild);
+    
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(a) {
+            if (a.style.position === 'fixed') {
+                a.remove();
+            }
+        });
+    }, 4000);
+}
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

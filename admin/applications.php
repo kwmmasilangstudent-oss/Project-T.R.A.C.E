@@ -121,6 +121,7 @@ try {
 
 require_once __DIR__ . '/../includes/header.php';
 require_once __DIR__ . '/../includes/navbar.php';
+require_once __DIR__ . '/../includes/confirmation-modal.php';
 ?>
 
 <div class="container-fluid">
@@ -227,31 +228,29 @@ require_once __DIR__ . '/../includes/navbar.php';
                                     <td><span class="badge <?php echo $statusBadge; ?>"><?php echo e(str_replace('_', ' ', ucwords($app['status']))); ?></span></td>
                                     <td><?php echo e($app['remarks'] ?? '-'); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($app['created_at'])); ?></td>
-                                    <td>
-                                        <form method="post" class="d-flex flex-wrap gap-1">
-                                            <?php echo csrfField(); ?>
-                                            <input type="hidden" name="application_id" value="<?php echo (int) $app['id']; ?>">
-                                            <?php if (in_array($app['status'], ['submitted', 'pending'])): ?>
-                                                <button type="submit" name="action" value="review" class="btn btn-sm btn-outline-info">Review</button>
-                                            <?php endif; ?>
-                                            <?php if ($app['status'] === 'under_review'): ?>
-                                                <button type="submit" name="action" value="approve" class="btn btn-sm btn-outline-success">Approve</button>
-                                                <button type="submit" name="action" value="reject" class="btn btn-outline-danger btn-sm">Reject</button>
-                                            <?php endif; ?>
-                                            <?php if ($app['status'] === 'approved'): ?>
-                                                <button type="submit" name="action" value="ready" class="btn btn-sm btn-outline-success">Ready</button>
-                                            <?php endif; ?>
-                                            <?php if ($app['status'] === 'ready_for_pickup'): ?>
-                                                <button type="submit" name="action" value="complete" class="btn btn-sm btn-outline-primary">Complete</button>
-                                            <?php endif; ?>
-                                        </form>
-                                        <form method="post" class="d-flex mt-1">
-                                            <?php echo csrfField(); ?>
-                                            <input type="hidden" name="application_id" value="<?php echo (int) $app['id']; ?>">
-                                            <input type="text" name="remarks" class="form-control form-control-sm" placeholder="Add remarks..." value="<?php echo e($app['remarks'] ?? ''); ?>">
-                                            <button type="submit" name="action" value="update_remarks" class="btn btn-sm btn-outline-secondary ms-1">Save</button>
-                                        </form>
-                                    </td>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-1" data-csrf="<?php echo csrfToken(); ?>">
+                                                <?php if (in_array($app['status'], ['submitted', 'pending'])): ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-application-id="<?php echo (int) $app['id']; ?>" data-action="review">Review</button>
+                                                <?php endif; ?>
+                                                <?php if ($app['status'] === 'under_review'): ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-success" data-application-id="<?php echo (int) $app['id']; ?>" data-action="approve">Approve</button>
+                                                    <button type="button" class="btn btn-outline-danger btn-sm" data-application-id="<?php echo (int) $app['id']; ?>" data-action="reject">Reject</button>
+                                                <?php endif; ?>
+                                                <?php if ($app['status'] === 'approved'): ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-success" data-application-id="<?php echo (int) $app['id']; ?>" data-action="ready">Ready</button>
+                                                <?php endif; ?>
+                                                <?php if ($app['status'] === 'ready_for_pickup'): ?>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" data-application-id="<?php echo (int) $app['id']; ?>" data-action="complete">Complete</button>
+                                                <?php endif; ?>
+                                            </div>
+                                            <form method="post" class="d-flex mt-1">
+                                                <?php echo csrfField(); ?>
+                                                <input type="hidden" name="application_id" value="<?php echo (int) $app['id']; ?>">
+                                                <input type="text" name="remarks" class="form-control form-control-sm" placeholder="Add remarks..." value="<?php echo e($app['remarks'] ?? ''); ?>">
+                                                <button type="submit" name="action" value="update_remarks" class="btn btn-sm btn-outline-secondary ms-1">Save</button>
+                                            </form>
+                                        </td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php if (empty($applications)) : ?>
@@ -269,5 +268,134 @@ require_once __DIR__ . '/../includes/navbar.php';
         </div>
     </div>
 </div>
+
+<script>
+var applicationModalData = {
+    applicationId: null,
+    action: null,
+    button: null,
+    csrfToken: null
+};
+
+var confirmMessages = {
+    review: 'Mark this application as under review? The resident will be notified.',
+    approve: 'Approve this application? The resident will be notified.',
+    reject: 'Reject this application? The resident will be notified.',
+    ready: 'Mark this application as ready for pickup? The resident will be notified.',
+    complete: 'Mark this application as complete? The resident will be notified.',
+    pending: 'Move this application back to pending status?'
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    var actionButtons = document.querySelectorAll('.btn[data-application-id]');
+    actionButtons.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            var applicationId = this.dataset.applicationId;
+            var action = this.dataset.action;
+            var csrfToken = this.closest('[data-csrf]').dataset.csrf;
+            
+            if (!applicationId || !action) return;
+            
+            applicationModalData.applicationId = applicationId;
+            applicationModalData.action = action;
+            applicationModalData.button = this;
+            applicationModalData.csrfToken = csrfToken;
+            
+            var confirmMessage = confirmMessages[action] || 'Are you sure?';
+            document.getElementById('confirmMessage').textContent = confirmMessage;
+            
+            var modal = new bootstrap.Modal(document.getElementById('actionConfirmModal'));
+            modal.show();
+        });
+    });
+    
+    document.getElementById('confirmActionBtn').addEventListener('click', function() {
+        performApplicationAction();
+    });
+});
+
+function performApplicationAction() {
+    var data = applicationModalData;
+    var btn = data.button;
+    
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    var originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    
+    var formData = new FormData();
+    formData.append('application_id', data.applicationId);
+    formData.append('action', data.action);
+    formData.append('csrf_token', data.csrfToken);
+    
+    fetch('/admin/api/applications-action.php', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+        }
+        
+        var contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            return response.text().then(text => {
+                throw new Error('Invalid response format. Expected JSON, got: ' + contentType + '. Response: ' + text.substring(0, 100));
+            });
+        }
+        
+        return response.json();
+    })
+    .then(result => {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('actionConfirmModal'));
+        if (modal) modal.hide();
+        
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(function() {
+                location.reload();
+            }, 1500);
+        } else {
+            showToast(result.message || 'An error occurred', 'error');
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.innerHTML = originalHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Application action error:', error);
+        showToast('Error: ' + error.message, 'error');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.innerHTML = originalHtml;
+    });
+}
+
+function showToast(message, type) {
+    var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    var alertHtml = '<div class="alert ' + alertClass + ' alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
+        message +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>';
+    
+    var alertDiv = document.createElement('div');
+    alertDiv.innerHTML = alertHtml;
+    document.body.appendChild(alertDiv.firstElementChild);
+    
+    setTimeout(function() {
+        var alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(a) {
+            if (a.style.position === 'fixed') {
+                a.remove();
+            }
+        });
+    }, 4000);
+}
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php';

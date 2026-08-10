@@ -357,14 +357,27 @@ function notifyApplicationSubmitted(int $applicationId): void {
 function notifyApplicationStatus(int $applicationId, string $status, ?int $createdBy = null): void {
     try {
         $pdo = getDbConnection();
+        $type = 'request';
+        $label = ucwords(str_replace('_', ' ', $status));
+        $link = defined('BASE_URL') ? BASE_URL . '/resident/requests.php' : '/resident/requests.php';
+
         $stmt = $pdo->prepare('SELECT a.application_type, r.user_id FROM applications a LEFT JOIN residents r ON r.id = a.resident_id WHERE a.id = ? LIMIT 1');
         $stmt->execute([$applicationId]);
         $row = $stmt->fetch();
-        if ($row && !empty($row['user_id'])) {
+        if ($row) {
             $type = $row['application_type'] ?: 'request';
-            $label = ucwords(str_replace('_', ' ', $status));
-            $link = defined('BASE_URL') ? BASE_URL . '/resident/requests.php' : '/resident/requests.php';
-            createNotification((int) $row['user_id'], 'Your ' . $type . ' request #' . $applicationId . ' status is now ' . $label . '.', $link, $createdBy);
+            if (!empty($row['user_id'])) {
+                createNotification((int) $row['user_id'], 'Your ' . $type . ' request #' . $applicationId . ' status is now ' . $label . '.', $link, $createdBy);
+            }
+        }
+
+        $adminStmt = $pdo->query('SELECT id FROM users WHERE role IN ("secretary", "admin")');
+        $adminUsers = $adminStmt->fetchAll();
+        $actorId = (int) ($createdBy ?? 0);
+        foreach ($adminUsers as $adminUser) {
+            if ((int) $adminUser['id'] !== $actorId) {
+                createNotification((int) $adminUser['id'], 'Application #' . $applicationId . ' (' . $type . ') status updated to ' . $label . '.', $link, $actorId);
+            }
         }
     } catch (Throwable $e) {
         // Silent fail
