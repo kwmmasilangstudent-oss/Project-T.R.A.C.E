@@ -1,61 +1,93 @@
 flowchart TD
-    README[README.md Structure] --> Header[Project Header]
-    README --> Phases[Implemented Phases]
-    README --> Features[Features]
-    README --> QuickStart[Quick Start]
-    README --> Structure[Project Structure]
-    README --> Tech[Technology Stack]
-    README --> License[License]
-
-    Header --> Acronym[T.R.A.C.E. Definition]
-    Header --> Desc[System Description]
-
-    Phases --> P1[Phase 1: Planning & Requirements]
-    Phases --> P2[Phase 2: UI/UX Design & Landing Pages]
-    Phases --> P3[Phase 3: Database Design & Schema]
-    Phases --> P4[Phase 4: Authentication & RBAC]
-    Phases --> P5[Phase 5: Dynamic Landing Website CMS]
-    Phases --> P6[Phase 6: QR Identification System]
-    Phases --> P7[Phase 7: Resident Management]
-    Phases --> P8[Phase 8: Document Management]
-    Phases --> P9[Phase 9: Application Request System]
-    Phases --> P10[Phase 10: Project Budget & Agenda Mgmt]
-    Phases --> P11[Phase 11: Announcement System]
-    Phases --> P12[Phase 12: Admin Dashboard & System Controls]
-
-    Features --> RBAC[Role-Based Access Control]
-    Features --> QR[QR Identification]
-    Features --> Docs[Document Generation - 10 types]
-    Features --> Apps[Application Workflow]
-    Features --> Projects[Project Management]
-    Features --> Budget[Budget & Expenses]
-    Features --> Agenda[Agenda Management]
-    Features --> Announce[Announcements - 7 types]
-    Features --> Reports[Reports - 9 types]
-    Features --> Audit[Audit Logs]
-    Features --> Backup[Backup & Restore]
-    Features --> Notify[Notifications]
-    Features --> Analytics[Analytics]
-
-    QuickStart --> Import[Import trace.sql]
-    QuickStart --> Config[Configure constants.php]
-    QuickStart --> Start[Start XAMPP]
-    QuickStart --> Login[Login with default credentials]
-
-    Structure --> Assets[assets/ - CSS, JS, uploads]
-    Structure --> Config[config/ - Database, session, constants]
-    Structure --> Includes[includes/ - Reusable PHP]
-    Structure --> Admin[admin/ - Administrator modules]
-    Structure --> Secretary[secretary/ - Secretary modules]
-    Structure --> Resident[resident/ - Resident modules]
-    Structure --> Landing[landing/ - Public pages]
-    Structure --> Auth[auth/ - Authentication pages]
-    Structure --> Database[database/ - SQL schema & seeds]
-    Structure --> Index[index.php - Entry point]
-
-    Tech --> PHP[PHP 8 Procedural]
-    Tech --> MySQL[MySQL]
-    Tech --> Bootstrap[Bootstrap 5]
-    Tech --> BootstrapIcons[Bootstrap Icons]
-    Tech --> JS[Vanilla JavaScript]
-    Tech --> GD[PHP GD QR Generation]
+    Start([User Visits System]) --> IsLogged{Already Logged In?}
+    
+    IsLogged -->|No| Guest[Guest / Public Visitor]
+    IsLogged -->|Yes| CheckRole{User Role?}
+    
+    Guest --> Landing[Landing Page<br/>index.php → landing/home.php]
+    Landing --> LandingNav[Navigate Landing Sections]
+    LandingNav --> About[about.php]
+    LandingNav --> Services[services.php]
+    LandingNav --> Officials[officials.php]
+    LandingNav --> Announcements[announcements.php]
+    LandingNav --> Events[events.php]
+    LandingNav --> Gallery[gallery.php]
+    LandingNav --> Contact[contact.php]
+    Landing --> Login[Login Page<br/>auth/login.php]
+    Landing --> Register[Register<br/>auth/register.php]
+    Landing --> Forgot[Forgot Password<br/>auth/forgot_password.php]
+    
+    Login --> AuthSubmit{Authenticate}
+    AuthSubmit -->|Invalid| LoginError[Show Error]
+    LoginError --> Login
+    AuthSubmit -->|Valid| CheckRole
+    
+    Forgot --> Reset[Reset Password<br/>auth/reset_password.php]
+    Register --> GoogleAuth[Google OAuth<br/>auth/google_login.php]
+    GoogleAuth --> Callback[Callback<br/>auth/google_callback.php]
+    Callback --> CheckRole
+    
+    CheckRole -->|admin| AdminDash[Admin Dashboard<br/>admin/dashboard.php]
+    CheckRole -->|secretary| SecDash[Secretary Dashboard<br/>secretary/dashboard.php]
+    CheckRole -->|resident| ResDash[Resident Dashboard<br/>resident/dashboard.php]
+    
+    AdminDash --> AdminModules[Admin Modules]
+    AdminModules --> Users[User Management<br/>admin/users.php]
+    AdminModules --> OfficialsMgmt[Officials Management<br/>admin/officials.php]
+    AdminModules --> ResidentsMgmt[Resident Management<br/>admin/residents.php]
+    AdminModules --> ResidentProfiling[Resident Profiling<br/>admin/resident_profiling.php]
+    AdminModules --> Applications[Applications<br/>admin/applications.php]
+    AdminModules --> DocumentsMgmt[Document Templates<br/>admin/templates.php]
+    AdminModules --> Projects[Projects<br/>admin/projects.php]
+    AdminModules --> Budget[Budget<br/>admin/budget.php]
+    AdminModules --> Agenda[Agenda<br/>admin/agenda.php]
+    AdminModules --> AnnouncementsMgmt[Announcements<br/>admin/announcements.php]
+    AdminModules --> Reports[Reports<br/>admin/reports.php]
+    AdminModules --> Settings[Settings<br/>admin/settings.php]
+    AdminModules --> Logs[Audit Logs<br/>admin/logs.php]
+    AdminModules --> Backup[Backup<br/>admin/backup.php]
+    AdminModules --> CCTV[CCTV<br/>admin/cctv.php]
+    AdminModules --> LandingContent[Landing Content<br/>admin/landing_content.php]
+    AdminModules --> Appointments[Appointments<br/>admin/appointments.php]
+    AdminModules --> Notifications[Notifications<br/>admin/notifications.php]
+    
+    SecDash --> SecModules[Secretary Modules]
+    SecModules --> SecResidents[Residents<br/>secretary/residents.php]
+    SecModules --> SecQR[QR Generation<br/>secretary/qr.php]
+    SecModules --> SecDocuments[Documents<br/>secretary/documents.php]
+    SecModules --> SecRequests[Requests<br/>secretary/requests.php]
+    SecModules --> SecProjects[Projects<br/>secretary/projects.php]
+    SecModules --> SecBudget[Budget<br/>secretary/budget.php]
+    SecModules --> SecAgenda[Agenda<br/>secretary/agenda.php]
+    SecModules --> SecAnnouncements[Announcements<br/>secretary/announcements.php]
+    SecModules --> SecReports[Reports<br/>secretary/reports.php]
+    SecModules --> SecSettings[Settings<br/>secretary/settings.php]
+    SecModules --> SecNotifications[Notifications<br/>secretary/notifications.php]
+    SecModules --> SecEventAttendees[Event Attendees<br/>secretary/event_attendees.php]
+    
+    ResDash --> ResModules[Resident Modules]
+    ResModules --> ResProfile[Profile<br/>resident/profile.php]
+    ResModules --> ResQR[My QR<br/>resident/qr.php]
+    ResModules --> ResRequests[My Requests<br/>resident/requests.php]
+    ResModules --> ResAppointments[Appointments<br/>resident/appointments.php]
+    ResModules --> ResAnnouncements[Announcements<br/>resident/announcement.php]
+    ResModules --> ResNotifications[Notifications<br/>resident/notifications.php]
+    ResModules --> ResSettings[Settings<br/>resident/settings.php]
+    
+    AdminDash --> Scanner[QR Scanner<br/>scanner/index.php]
+    SecDash --> Scanner
+    Scanner --> ScanAPI[Scan API<br/>scanner/api/scan_handler.php]
+    Scanner --> ScanLogs[Scan Logs<br/>scanner/logs.php]
+    Scanner --> Attendance[Attendance Sheet<br/>scanner/attendance_sheet.php]
+    
+    AdminDash --> Logout[Logout<br/>auth/logout.php]
+    SecDash --> Logout
+    ResDash --> Logout
+    Logout --> Start
+    
+    style Start fill:#10b981,color:#fff,stroke:#059669,stroke-width:2px
+    style Landing fill:#0f172a,color:#fff,stroke:#1e293b,stroke-width:1px
+    style AdminDash fill:#1e3a5f,color:#fff,stroke:#3b82f6,stroke-width:2px
+    style SecDash fill:#1a4d3a,color:#fff,stroke:#10b981,stroke-width:2px
+    style ResDash fill:#4c1d95,color:#fff,stroke:#8b5cf6,stroke-width:2px
+    style Logout fill:#ef4444,color:#fff,stroke:#dc2626,stroke-width:2px

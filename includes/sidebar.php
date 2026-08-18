@@ -16,7 +16,6 @@ $navGroups = [];
         ),
         'People & Records' => array(
             array('users.php', 'bi-people', 'Users'),
-            array('officials.php', 'bi-person-badge', 'Officials'),
             array('residents.php', 'bi-house-door', 'Residents'),
             array('resident_profiling.php', 'bi-person-vcard', 'Resident Profiling'),
         ),
@@ -33,6 +32,7 @@ $navGroups = [];
             array('announcements.php', 'bi-megaphone', 'Announcements'),
             array('notifications.php', 'bi-bell', 'Notifications'),
             array('landing_content.php', 'bi-layout-text-window', 'Landing Content'),
+            array('gallery.php', 'bi-images', 'Gallery'),
         ),
         'Surveillance' => array(
             array('cctv.php', 'bi-camera-video', 'CCTV Live'),

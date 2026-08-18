@@ -575,10 +575,7 @@ require_once __DIR__ . '/../includes/header.php';
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3 p-0">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
         <div class="col-md-9 py-4">
                 <!-- Page Header -->
                 <div class="d-flex justify-content-between align-items-center mb-4">

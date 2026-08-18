@@ -126,9 +126,7 @@ require_once __DIR__ . '/../includes/confirmation-modal.php';
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 p-0">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
         <div class="col-md-9 py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>

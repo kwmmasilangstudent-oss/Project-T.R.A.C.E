@@ -500,6 +500,17 @@ body {
 
 .gl-item-meta i { font-size: 0.75rem; }
 
+.gl-item-desc {
+    font-size: 0.8rem;
+    color: var(--gl-light);
+    line-height: 1.4;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 /* Featured overlay info */
 .gl-featured .gl-item-info {
     position: absolute;
@@ -965,6 +976,7 @@ body {
                 $imagePath = $item['image_path'] ?? $item['image'] ?? $item['photo'] ?? $item['file_path'] ?? '';
                 $itemCategory = $hasCategory ? ($item['category'] ?? '') : '';
                 $itemDate = $item['created_at'] ?? '';
+                $itemDescription = $item['description'] ?? '';
                 $isFeatured = ($i === 0 && $totalItems > 4);
                 $delay = 'gl-d' . min(($i % 9) + 1, 9);
                 $hasImage = !empty($imagePath);
@@ -1000,6 +1012,9 @@ body {
                     <?php if (!$isFeatured): ?>
                         <div class="gl-item-info">
                             <div class="gl-item-title"><?php echo e($title); ?></div>
+                            <?php if (!empty($itemDescription)): ?>
+                                <div class="gl-item-desc"><?php echo e($itemDescription); ?></div>
+                            <?php endif; ?>
                             <div class="gl-item-meta">
                                 <?php if (!empty($itemDate)): ?>
                                     <span><i class="bi bi-calendar3"></i> <?php echo date('M d, Y', strtotime($itemDate)); ?></span>
@@ -1009,6 +1024,9 @@ body {
                     <?php else: ?>
                         <div class="gl-item-info">
                             <div class="gl-item-title"><?php echo e($title); ?></div>
+                            <?php if (!empty($itemDescription)): ?>
+                                <div class="gl-item-desc"><?php echo e($itemDescription); ?></div>
+                            <?php endif; ?>
                             <div class="gl-item-meta">
                                 <?php if (!empty($itemDate)): ?>
                                     <span><i class="bi bi-calendar3"></i> <?php echo date('M d, Y', strtotime($itemDate)); ?></span>

@@ -97,11 +97,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fileName = 'achievements_' . uniqid() . '_' . basename($_FILES['achievements_image']['name']);
             $targetPath = $uploadDir . $fileName;
             if (move_uploaded_file($_FILES['achievements_image']['tmp_name'], $targetPath)) {
+                $oldImage = getSetting('achievements_image', '');
+                if ($oldImage) {
+                    $oldPath = __DIR__ . '/../' . $oldImage;
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                    $pdo->prepare('DELETE FROM gallery WHERE image_path = ?')->execute([$oldImage]);
+                }
                 $pdo->prepare('INSERT INTO settings (key_name, key_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE key_value = VALUES(key_value)')->execute(['achievements_image', 'assets/uploads/' . $fileName]);
                 $description = trim($_POST['achievements_description'] ?? '');
                 if ($description !== '') {
                     $pdo->prepare('INSERT INTO settings (key_name, key_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE key_value = VALUES(key_value)')->execute(['achievements_description', $description]);
                 }
+                $pdo->prepare('INSERT INTO gallery (title, image_path, description) VALUES (?, ?, ?)')->execute(['Achievements', 'assets/uploads/' . $fileName, $description]);
                 logAudit('upload_achievements_image', 'Uploaded achievements image with description');
                 $_SESSION['_flash_success'] = 'Achievements image uploaded successfully.';
                 header('Location: ' . $_SERVER['REQUEST_URI']);
@@ -125,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (file_exists($path)) {
                 unlink($path);
             }
+            $pdo->prepare('DELETE FROM gallery WHERE image_path = ?')->execute([$row['key_value']]);
         }
         $pdo->prepare('UPDATE settings SET key_value = "" WHERE key_name = ?')->execute(['achievements_image']);
         $pdo->prepare('UPDATE settings SET key_value = "" WHERE key_name = ?')->execute(['achievements_description']);
@@ -727,9 +737,7 @@ require_once __DIR__ . '/../includes/navbar.php';
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 p-0">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+       <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
         <div class="col-md-9 py-4">
 
             <div class="lc-page-header d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
@@ -787,56 +795,6 @@ require_once __DIR__ . '/../includes/navbar.php';
                             </div>
                             <button type="submit" class="btn btn-outline-danger w-100 mt-auto" <?php echo empty($heroBackground) ? 'disabled' : ''; ?>>
                                 <i class="bi bi-trash3 me-1"></i>Remove Background
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-card p-4 mb-4">
-                <h5 class="lc-card-title"><i class="bi bi-trophy"></i>Achievements Image</h5>
-                <div class="row g-4 align-items-stretch">
-                    <div class="col-md-4">
-                        <div class="lc-divider-label">Current Image</div>
-                        <?php if (!empty($achievementsImage)): ?>
-                            <img src="<?php echo asset($achievementsImage); ?>" alt="Achievements image" class="lc-hero-preview">
-                        <?php else: ?>
-                            <div class="lc-hero-placeholder">
-                                <i class="bi bi-trophy"></i>
-                                <span>No achievements image uploaded</span>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="lc-divider-label">Upload New</div>
-                        <form method="post" enctype="multipart/form-data">
-                            <?php echo csrfField(); ?>
-                            <input type="hidden" name="action" value="upload_achievements_image">
-                            <div class="lc-upload-dropzone mb-3">
-                                <label class="lc-field-label mb-2"><i class="bi bi-cloud-arrow-up me-1"></i>Choose an image file</label>
-                                <input type="file" name="achievements_image" class="form-control" accept="image/*">
-                            </div>
-                            <div class="mb-3">
-                                <label class="lc-field-label mb-2"><i class="bi bi-card-text me-1"></i>Description</label>
-                                <textarea name="achievements_description" class="form-control" rows="3" placeholder="Enter a description for this achievements image..."><?php echo e(getSetting('achievements_description', '')); ?></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload me-1"></i>Upload</button>
-                        </form>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="lc-divider-label">Status</div>
-                        <form method="post" onsubmit="return confirm('Remove current achievements image?')" class="d-flex flex-column h-100">
-                            <?php echo csrfField(); ?>
-                            <input type="hidden" name="action" value="remove_achievements_image">
-                            <div class="mb-3">
-                                <?php if (!empty($achievementsImage)): ?>
-                                    <span class="lc-status-pill lc-status-active"><i class="bi bi-circle-fill"></i>Image active</span>
-                                <?php else: ?>
-                                    <span class="lc-status-pill lc-status-inactive"><i class="bi bi-circle-fill"></i>No image set</span>
-                                <?php endif; ?>
-                            </div>
-                            <button type="submit" class="btn btn-outline-danger w-100 mt-auto" <?php echo empty($achievementsImage) ? 'disabled' : ''; ?>>
-                                <i class="bi bi-trash3 me-1"></i>Remove Image
                             </button>
                         </form>
                     </div>

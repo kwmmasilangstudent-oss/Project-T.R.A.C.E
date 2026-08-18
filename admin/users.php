@@ -229,10 +229,9 @@ require_once __DIR__ . '/../includes/navbar.php';
 
 <div class="container-fluid">
     <div class="row">
-             <!-- Sidebar -->
-        <div class="col-md-3 p-0">
+             
             <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        
         <div class="col-md-9 py-4 px-3 px-md-4">
             <!-- Page Header -->
             <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">

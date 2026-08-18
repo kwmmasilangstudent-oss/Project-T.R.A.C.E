@@ -4,3 +4,5 @@
 [503] 2026-08-11 21:47:08 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'contact_number' in 'field list' in C:\xampp\htdocs\FinalTrace\admin\landing_content.php on line 130
 [503] 2026-08-11 21:47:08 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'contact_number' in 'field list' in C:\xampp\htdocs\FinalTrace\admin\landing_content.php on line 130
 [503] 2026-08-11 21:47:32 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'contact_number' in 'field list' in C:\xampp\htdocs\FinalTrace\admin\landing_content.php on line 151
+[503] 2026-08-18 21:11:17 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'description' in 'field list' in C:\xampp\htdocs\FinalTrace\admin\landing_content.php on line 105
+[503] 2026-08-18 21:13:11 SQLSTATE[42S22]: Column not found: 1054 Unknown column 'description' in 'field list' in C:\xampp\htdocs\FinalTrace\admin\landing_content.php on line 105

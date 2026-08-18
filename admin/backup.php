@@ -143,9 +143,7 @@ require_once __DIR__ . '/../includes/navbar.php';
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-3 p-0">
-            <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
         <div class="col-md-9 py-4">
             <h3>Backup & Restore</h3>
             <p class="text-muted">Create, download, and manage database backups.</p>

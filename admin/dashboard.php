@@ -124,10 +124,8 @@ require_once __DIR__ . '/../includes/navbar.php';
 
 <div class="container-fluid">
     <div class="row">
-         <!-- Sidebar -->
-        <div class="col-md-3 p-0">
             <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
-        </div>
+        
         <div class="col-md-9 py-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -316,20 +314,6 @@ require_once __DIR__ . '/../includes/navbar.php';
                                 <div class="rounded-circle bg-success-subtle p-2"><i class="bi bi-qr-code-scan text-success"></i></div>
                             </div>
                             <small class="text-muted d-block mt-2">Verification scans</small>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3">
-                    <a href="<?php echo BASE_URL; ?>/admin/officials.php" class="text-decoration-none">
-                        <div class="glass-card p-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6 class="text-muted mb-1">Officials</h6>
-                                    <p class="display-6 mb-0 fw-bold"><?php echo e($stats['total_officials'] ?? 0); ?></p>
-                                </div>
-                                <div class="rounded-circle bg-primary-subtle p-2"><i class="bi bi-person-badge text-primary"></i></div>
-                            </div>
-                            <small class="text-muted d-block mt-2">Active barangay officials</small>
                         </div>
                     </a>
                 </div>

@@ -863,14 +863,7 @@ a.ct-hero-contact-item:hover .ct-hero-contact-value { color: #7dd3fc; }
                 </div>
             </a>
             <?php endif; ?>
-            <div class="ct-hero-contact-item ct-reveal ct-d3">
-                <div class="ct-hero-contact-icon" style="background:rgba(239,68,68,0.15); color:#ef4444;">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                </div>
-                <div>
-                    <div class="ct-hero-contact-label">Emergency</div>
-                    <div class="ct-hero-contact-value">911</div>
-                </div>
+            
             </div>
             <?php if (!empty($officeAddress)): ?>
             <div class="ct-hero-contact-item ct-reveal ct-d4">
@@ -1099,26 +1092,7 @@ a.ct-hero-contact-item:hover .ct-hero-contact-value { color: #7dd3fc; }
      ═══════════════════════════════════════ -->
 <section class="ct-section">
     <div class="container">
-        <div class="ct-section-header ct-reveal">
-            <div class="ct-section-tag"><i class="bi bi-geo-alt"></i> Location</div>
-            <h2 class="ct-section-title">Find Us</h2>
-            <p class="ct-section-subtitle">Visit the barangay hall for in-person inquiries and document processing.</p>
-        </div>
-
-        <div class="ct-map-card ct-reveal ct-d1">
-            <?php if (!empty($mapEmbed)): ?>
-                <div class="ct-map-wrapper" style="height:400px;padding:0;">
-                    <?php echo $mapEmbed; ?>
-                </div>
-            <?php else: ?>
-                <div class="ct-map-wrapper">
-                    <div class="ct-map-placeholder-icon"><i class="bi bi-geo-alt-fill"></i></div>
-                    <div class="ct-map-placeholder-text"><?php echo e($officeAddress ?: 'Barangay Hall, ' . $barangayName); ?></div>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
+        
 
 <!-- ═══════════════════════════════════════
      CTA
