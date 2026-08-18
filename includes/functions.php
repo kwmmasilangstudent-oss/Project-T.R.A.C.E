@@ -60,6 +60,15 @@ function getLandingContent(string $section, string $default = ''): string {
     }
 }
 
+function renderLandingMarkdown(string $text): string {
+    $text = nl2br(e($text));
+    $text = preg_replace('/\/\*\*(.+?)\*\*\//', '<strong>$1</strong>', $text);
+    $text = preg_replace('/\*(.+?)\*/', '<em>$1</em>', $text);
+    $text = preg_replace('/^\- (.+)$/m', '<li>$1</li>', $text);
+    $text = preg_replace('/(<li>.+<\/li>)/s', '<ul>$1</ul>', $text);
+    return $text;
+}
+
 function getRoleLabel(string $role): string {
     return match ($role) {
         'admin' => 'Administrator',
@@ -783,6 +792,146 @@ function runScheduledBackup(): ?string {
         return $fileName;
     } catch (Throwable $e) {
         logError('Scheduled backup failed', $e);
+        return null;
+    }
+}
+
+function generateDocumentFile(int $residentId, string $documentType, string $purpose, string $documentNumber, string $controlNumber, ?int $issuedBy): ?string {
+    try {
+        $pdo = getDbConnection();
+
+        $stmt = $pdo->prepare('SELECT a.*, r.full_name, r.address FROM application_templates a LEFT JOIN residents r ON r.id = ? WHERE a.document_type = ? LIMIT 1');
+        $stmt->execute([$residentId, $documentType]);
+        $template = $stmt->fetch();
+
+        if (!$template) {
+            return null;
+        }
+
+        $residentStmt = $pdo->prepare('SELECT r.full_name, r.address, p.occupation FROM residents r LEFT JOIN personal_information p ON p.resident_id = r.id WHERE r.id = ? LIMIT 1');
+        $residentStmt->execute([$residentId]);
+        $resident = $residentStmt->fetch();
+
+        $fullName = $resident['full_name'] ?? 'Unknown Resident';
+        $address = $resident['address'] ?? 'N/A';
+        $date = date('F d, Y');
+
+        $header = $template['header_content'] ?? '';
+        $body = $template['body_content'] ?? '';
+        $footer = $template['footer_content'] ?? '';
+        $watermark = $template['watermark_text'] ?? '';
+        $signatory1 = $template['signature_line_1'] ?? '';
+        $signatory2 = $template['signature_line_2'] ?? '';
+
+        $placeholders = [
+            '{{FULL_NAME}}',
+            '{{ADDRESS}}',
+            '{{DOCUMENT_NUMBER}}',
+            '{{CONTROL_NUMBER}}',
+            '{{PURPOSE}}',
+            '{{DATE}}',
+            '{{SIGNATORY_1}}',
+            '{{SIGNATORY_2}}'
+        ];
+        $values = [
+            $fullName,
+            $address,
+            $documentNumber,
+            $controlNumber,
+            $purpose ?: 'General Purpose',
+            $date,
+            $signatory1,
+            $signatory2
+        ];
+
+        $header = str_replace($placeholders, $values, $header);
+        $body = str_replace($placeholders, $values, $body);
+        $footer = str_replace($placeholders, $values, $footer);
+
+        $watermarkStyle = '';
+        if ($watermark) {
+            $watermarkStyle = 'body::before{content:"' . addslashes($watermark) . '";position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:80px;color:rgba(0,0,0,0.04);pointer-events:none;z-index:0;white-space:nowrap;}';
+        }
+
+        $html = '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . htmlspecialchars($documentType, ENT_QUOTES) . ' - ' . htmlspecialchars($fullName, ENT_QUOTES) . '</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Inter", sans-serif;
+            background: #ffffff;
+            color: #1e293b;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        ' . $watermarkStyle . '
+        .doc-container {
+            border: 2px solid #1e293b;
+            padding: 40px;
+            min-height: 600px;
+            position: relative;
+            background: #ffffff;
+        }
+        .doc-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #1e293b; }
+        .doc-header h1 { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+        .doc-header p { font-size: 12px; color: #64748b; margin-top: 5px; }
+        .doc-body { font-size: 14px; line-height: 1.8; margin-bottom: 40px; }
+        .doc-body p { margin-bottom: 15px; text-align: justify; }
+        .doc-footer { margin-top: 60px; }
+        .doc-number { font-size: 11px; color: #64748b; margin-bottom: 20px; }
+        .doc-number strong { color: #1e293b; }
+        .signature-block { display: flex; justify-content: space-between; margin-top: 40px; }
+        .signature-box { text-align: center; width: 200px; }
+        .signature-line { border-top: 1px solid #1e293b; padding-top: 8px; font-size: 12px; color: #475569; }
+        @media print {
+            body { padding: 0; }
+            .doc-container { border: 2px solid #000; padding: 30px; }
+            @page { margin: 20mm; }
+        }
+    </style>
+</head>
+<body>
+    <div class="doc-container">
+        <div class="doc-header">
+            ' . $header . '
+        </div>
+        <div class="doc-body">
+            ' . $body . '
+        </div>
+        <div class="doc-footer">
+            <div class="doc-number">
+                <strong>Document No:</strong> ' . htmlspecialchars($documentNumber, ENT_QUOTES) . '<br>
+                <strong>Control No:</strong> ' . htmlspecialchars($controlNumber, ENT_QUOTES) . '
+            </div>
+            ' . $footer . '
+        </div>
+    </div>
+</body>
+</html>';
+
+        $docDir = __DIR__ . '/../assets/uploads/documents';
+        if (!is_dir($docDir)) {
+            @mkdir($docDir, 0777, true);
+        }
+
+        $fileName = 'doc_' . $documentNumber . '_' . uniqid() . '.html';
+        $relativePath = 'assets/uploads/documents/' . $fileName;
+        $fullPath = $docDir . '/' . $fileName;
+
+        if (file_put_contents($fullPath, $html) === false) {
+            return null;
+        }
+
+        return $relativePath;
+    } catch (Throwable $e) {
+        error_log('Document generation failed: ' . $e->getMessage());
         return null;
     }
 }

@@ -35,9 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: ' . $_SERVER['REQUEST_URI']);
             exit;
         } else {
-            $stmt = $pdo->prepare('INSERT INTO officials (full_name, position, contact_number, photo_path) VALUES (?, ?, ?, ?)');
-            $stmt->execute([$fullName, $position, $contactNumber, $photoPath]);
-            logAudit('create_official', 'Created official: ' . $fullName . ' (' . $position . ')');
+            $stmt = $pdo->prepare('INSERT INTO landing_officials (official_name, position_title, contact_number, photo_path, tier, sort_order, position_label, email, committee, bio, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            $stmt->execute([$fullName, $position, $contactNumber, $photoPath, 'kagawad', 0, '', '', '', '', 1]);
+            logAudit('create_official', 'Created landing official: ' . $fullName . ' (' . $position . ')');
             $_SESSION['_flash_success'] = 'Official added successfully.';
             header('Location: ' . $_SERVER['REQUEST_URI']);
             exit;
@@ -72,13 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($photoPath) {
-                $stmt = $pdo->prepare('UPDATE officials SET full_name = ?, position = ?, contact_number = ?, photo_path = ? WHERE id = ?');
+                $stmt = $pdo->prepare('UPDATE landing_officials SET official_name = ?, position_title = ?, contact_number = ?, photo_path = ? WHERE id = ?');
                 $stmt->execute([$fullName, $position, $contactNumber, $photoPath, $officialId]);
             } else {
-                $stmt = $pdo->prepare('UPDATE officials SET full_name = ?, position = ?, contact_number = ? WHERE id = ?');
+                $stmt = $pdo->prepare('UPDATE landing_officials SET official_name = ?, position_title = ?, contact_number = ? WHERE id = ?');
                 $stmt->execute([$fullName, $position, $contactNumber, $officialId]);
             }
-            logAudit('update_official', 'Updated official ID: ' . $officialId);
+            logAudit('update_official', 'Updated landing official ID: ' . $officialId);
             $_SESSION['_flash_success'] = 'Official updated successfully.';
             header('Location: ' . $_SERVER['REQUEST_URI']);
             exit;
@@ -91,9 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: ' . $_SERVER['REQUEST_URI']);
             exit;
         } else {
-            $stmt = $pdo->prepare('DELETE FROM officials WHERE id = ?');
+            $stmt = $pdo->prepare('DELETE FROM landing_officials WHERE id = ?');
             $stmt->execute([$officialId]);
-            logAudit('delete_official', 'Deleted official ID: ' . $officialId);
+            logAudit('delete_official', 'Deleted landing official ID: ' . $officialId);
             $_SESSION['_flash_success'] = 'Official deleted successfully.';
             header('Location: ' . $_SERVER['REQUEST_URI']);
             exit;
@@ -104,31 +104,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $search = trim($_GET['search'] ?? '');
 $positionFilter = trim($_GET['position'] ?? '');
 
-$query = 'SELECT * FROM officials WHERE 1=1';
+$query = 'SELECT * FROM landing_officials WHERE 1=1';
 $params = [];
 
 if ($search) {
-    $query .= ' AND (full_name LIKE ? OR position LIKE ? OR contact_number LIKE ?)';
+    $query .= ' AND (official_name LIKE ? OR position_title LIKE ? OR contact_number LIKE ?)';
     $params[] = '%' . $search . '%';
     $params[] = '%' . $search . '%';
     $params[] = '%' . $search . '%';
 }
 if ($positionFilter) {
-    $query .= ' AND position = ?';
+    $query .= ' AND position_title = ?';
     $params[] = $positionFilter;
 }
-$query .= ' ORDER BY full_name ASC';
+$query .= ' ORDER BY FIELD(tier, "captain", "executive", "kagawad", "sk"), sort_order ASC';
 
 $stmt = $pdo->prepare($query);
 $stmt->execute($params);
 $officials = $stmt->fetchAll();
 
-$positions = $pdo->query('SELECT DISTINCT position FROM officials ORDER BY position')->fetchAll();
+$positions = $pdo->query('SELECT DISTINCT position_title FROM landing_officials ORDER BY position_title')->fetchAll();
 
-$statsQuery = 'SELECT
-    COUNT(*) as total,
-    COUNT(DISTINCT position) as unique_positions
-    FROM officials';
+$statsQuery = 'SELECT COUNT(*) as total, COUNT(DISTINCT position_title) as unique_positions FROM landing_officials';
 $stats = $pdo->query($statsQuery)->fetch();
 
 require_once __DIR__ . '/../includes/header.php';
@@ -141,6 +138,22 @@ require_once __DIR__ . '/../includes/navbar.php';
         <div class="col-md-3 p-0">
             <?php require_once __DIR__ . '/../includes/sidebar.php'; ?>
         </div>
+        <div class="col-md-9 py-4 px-3 px-md-4">
+            <!-- Page Header -->
+            <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                <div>
+                    <h3 class="mb-1">Officials Management</h3>
+                    <p class="text-muted-glass mb-0">Manage barangay official profiles, positions, photos, and contact details.</p>
+                </div>
+                <a href="<?php echo BASE_URL; ?>/admin/landing_content.php" class="btn btn-primary d-flex align-items-center gap-2">
+                    <i class="bi bi-layout-text-window"></i> Manage Landing Officials
+                </a>
+            </div>
+
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Note:</strong> This page is deprecated. Please use <a href="<?php echo BASE_URL; ?>/admin/landing_content.php" class="alert-link">Landing Content Management</a> to manage officials. The data here is synced with the landing page.
+            </div>
         <div class="col-md-9 py-4 px-3 px-md-4">
             <!-- Page Header -->
             <div class="page-header d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">

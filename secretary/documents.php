@@ -37,8 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_document']))
         $qrPath = null;
     }
 
-    $stmt = $pdo->prepare('INSERT INTO documents (resident_id, document_type, document_number, control_number, purpose, status, qr_code_path, issued_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-    $stmt->execute([$residentId, $documentType, $documentNumber, $controlNumber, $purpose, 'issued', $qrPath, $_SESSION['user_id'] ?? null]);
+    $filePath = null;
+    try {
+        $filePath = generateDocumentFile($residentId, $documentType, $purpose, $documentNumber, $controlNumber, (int) ($_SESSION['user_id'] ?? 0));
+    } catch (Throwable $e) {
+        $filePath = null;
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO documents (resident_id, document_type, document_number, control_number, purpose, status, qr_code_path, file_path, issued_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $stmt->execute([$residentId, $documentType, $documentNumber, $controlNumber, $purpose, 'issued', $qrPath, $filePath, $_SESSION['user_id'] ?? null]);
     $_SESSION['_flash_success'] = 'Document generated successfully. Document Number: ' . $documentNumber;
     header('Location: ' . $_SERVER['REQUEST_URI']);
     exit;
@@ -801,16 +808,9 @@ body {
                             <label class="dc-label"><i class="bi bi-file-earmark-text"></i> Document Type</label>
                             <select name="document_type" class="dc-select" required>
                                 <option value="">Select type</option>
-                                <option value="Barangay Clearance">Barangay Clearance</option>
-                                <option value="Certificate of Residency">Certificate of Residency</option>
-                                <option value="Certificate of Indigency">Certificate of Indigency</option>
-                                <option value="Business Clearance">Business Clearance</option>
-                                <option value="First Time Job Seeker">First Time Job Seeker</option>
-                                <option value="Good Moral">Good Moral</option>
-                                <option value="Solo Parent Certificate">Solo Parent Certificate</option>
-                                <option value="Low Income Certificate">Low Income Certificate</option>
-                                <option value="Certification">Certification</option>
-                                <option value="Custom Certificate">Custom Certificate</option>
+                                <?php foreach ($templates as $template): ?>
+                                    <option value="<?php echo e($template['document_type']); ?>"><?php echo e($template['name']); ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div>
@@ -921,6 +921,11 @@ body {
                                         <td><span class="dc-date"><?php echo date('M d, Y', strtotime($document['created_at'])); ?></span></td>
                                         <td>
                                             <div class="dc-actions">
+                                                <?php if (!empty($document['file_path'])): ?>
+                                                    <a href="<?php echo BASE_URL; ?>/<?php echo e($document['file_path']); ?>" target="_blank" class="dc-btn-sm dc-btn-qr" title="Print Document">
+                                                        <i class="bi bi-printer"></i> Print
+                                                    </a>
+                                                <?php endif; ?>
                                                 <form method="post" class="d-inline" onsubmit="return confirm('Archive this document?')">
                                                     <?php echo csrfField(); ?>
                                                     <input type="hidden" name="document_id" value="<?php echo (int) $document['id']; ?>">

@@ -579,8 +579,27 @@
             </button>
 
         <?php else: ?>
-            <!-- Right: profile -->
+            <!-- Right: notifications + profile -->
             <div class="nb-right">
+                <?php if (in_array(getCurrentRole(), ['admin', 'secretary'])): ?>
+                <?php
+                $notifRole = getCurrentRole();
+                $notifBase = ($notifRole === 'admin' ? BASE_URL . '/admin/' : BASE_URL . '/secretary/') . 'notifications.php';
+                $notifUnread = 0;
+                if (isset($_SESSION['user_id'])) {
+                    try {
+                        $notifPdo = getDbConnection();
+                        $notifUnread = (int) $notifPdo->prepare('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0')->execute([$_SESSION['user_id']]) ? $notifPdo->fetchColumn() : 0;
+                    } catch (Throwable $e) {}
+                }
+                ?>
+                <a href="<?php echo e($notifBase); ?>" class="nb-icon-btn" aria-label="Notifications" style="position:relative;">
+                    <i class="bi bi-bell" style="font-size:1.15rem;"></i>
+                    <?php if ($notifUnread > 0): ?>
+                        <span class="nb-notif-badge"><?php echo $notifUnread; ?></span>
+                    <?php endif; ?>
+                </a>
+                <?php endif; ?>
 
                 <!-- Profile -->
                 <div class="nb-dropdown-wrap">

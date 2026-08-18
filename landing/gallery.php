@@ -43,8 +43,13 @@ try {
 } catch (Throwable $e) {}
 
 $heroBg = getSetting('hero_background', '');
+$achievementsImage = getSetting('achievements_image', '');
 
 $totalItems = count($gallery);
+
+$achievementsContent = getLandingContent('achievements', '');
+$documentationContent = getLandingContent('documentation', '');
+$achievementsDescription = getSetting('achievements_description', '');
 ?>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1017,6 +1022,52 @@ body {
     </div>
 </section>
 
+<?php if (!empty($achievementsContent) || !empty($documentationContent)): ?>
+<!-- ═══════════════════════════════════════
+     ACHIEVEMENTS & DOCUMENTATION
+     ═══════════════════════════════════════ -->
+<section class="gl-gallery-section" style="padding-top:40px;">
+    <div class="container">
+        <div class="row g-4">
+            <?php if (!empty($achievementsContent)): ?>
+                <div class="col-md-6">
+                    <div class="gl-empty gl-reveal" style="padding:40px 32px;">
+                        <div class="gl-empty-icon" style="background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.15); color:#f59e0b;">
+                            <i class="bi bi-trophy"></i>
+                        </div>
+                        <h4 style="font-family:'Playfair Display',serif; font-weight:800; color:var(--gl-text); margin-bottom:12px;">Achievements</h4>
+                        <?php if (!empty($achievementsImage)): ?>
+                            <img src="<?php echo asset($achievementsImage); ?>" alt="Achievements" style="width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:16px;">
+                        <?php endif; ?>
+                        <?php if (!empty($achievementsDescription)): ?>
+                            <div style="font-size:0.9rem; color:var(--gl-muted); line-height:1.6; text-align:left; margin-bottom:12px; font-style:italic;">
+                                <?php echo e($achievementsDescription); ?>
+                            </div>
+                        <?php endif; ?>
+                        <div style="font-size:0.95rem; color:var(--gl-muted); line-height:1.7; text-align:left;">
+                            <?php echo renderLandingMarkdown($achievementsContent); ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+            <?php if (!empty($documentationContent)): ?>
+                <div class="col-md-6">
+                    <div class="gl-empty gl-reveal" style="padding:40px 32px;">
+                        <div class="gl-empty-icon" style="background:rgba(26,86,219,0.08); border-color:rgba(26,86,219,0.15); color:#1a56db;">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <h4 style="font-family:'Playfair Display',serif; font-weight:800; color:var(--gl-text); margin-bottom:12px;">Documentation</h4>
+                        <div style="font-size:0.95rem; color:var(--gl-muted); line-height:1.7; text-align:left;">
+                            <?php echo renderLandingMarkdown($documentationContent); ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
+
 <!-- ═══════════════════════════════════════
      LIGHTBOX
      ═══════════════════════════════════════ -->
@@ -1044,7 +1095,6 @@ body {
             </div>
             <h4>Gallery Coming Soon</h4>
             <p>No photos have been uploaded yet. Check back soon for moments and memories from <?php echo e($barangayName); ?> events and activities.</p>
-        </div>
     </div>
 </section>
 

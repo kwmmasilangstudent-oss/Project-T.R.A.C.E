@@ -31,6 +31,7 @@ $navGroups = [];
         ),
         'Communication' => array(
             array('announcements.php', 'bi-megaphone', 'Announcements'),
+            array('notifications.php', 'bi-bell', 'Notifications'),
             array('landing_content.php', 'bi-layout-text-window', 'Landing Content'),
         ),
         'Surveillance' => array(
@@ -68,6 +69,8 @@ $navGroups = [];
         ),
         'Communication' => array(
             array('announcements.php', 'bi-megaphone', 'Announcements'),
+            array('notifications.php', 'bi-bell', 'Notifications'),
+            array('../landing_content.php', 'bi-layout-text-window', 'Landing Content'),
         ),
         'System' => array(
             array('reports.php', 'bi-graph-up', 'Reports'),
