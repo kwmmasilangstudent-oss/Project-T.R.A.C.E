@@ -1090,7 +1090,7 @@ body {
         </div>
     </div>
 
-    <div class="lp-footer">Secure &bull; Encrypted &bull; Trusted</div>
+    
 </div>
 
 <!-- ═══════════════════════════════════════

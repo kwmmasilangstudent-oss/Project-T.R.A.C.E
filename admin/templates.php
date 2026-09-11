@@ -169,6 +169,129 @@ require_once __DIR__ . '/../includes/navbar.php';
                 </span>
             </div>
 
+            <style>
+                .print-preview-wrapper {
+                    background: #f8f9fa;
+                    padding: 20px;
+                    min-height: 500px;
+                }
+                .print-preview-toolbar {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    padding: 10px 16px;
+                    background: #ffffff;
+                    border: 1px solid rgba(0,0,0,0.08);
+                    border-radius: 8px 8px 0 0;
+                    border-bottom: none;
+                }
+                .print-preview-content {
+                    background: #ffffff;
+                    border: 1px solid rgba(0,0,0,0.08);
+                    border-radius: 0 0 8px 8px;
+                    padding: 40px;
+                    min-height: 500px;
+                }
+                .document-preview {
+                    position: relative;
+                    border: 2px solid #1e293b;
+                    padding: 40px;
+                    min-height: 600px;
+                    background: #ffffff;
+                    font-family: "Inter", sans-serif;
+                    color: #1e293b;
+                }
+                .preview-watermark {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) rotate(-30deg);
+                    font-size: 80px;
+                    color: rgba(0,0,0,0.04);
+                    pointer-events: none;
+                    z-index: 0;
+                    white-space: nowrap;
+                    font-weight: 700;
+                }
+                .preview-header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    padding-bottom: 20px;
+                    border-bottom: 2px solid #1e293b;
+                }
+                .preview-header h1 {
+                    font-size: 24px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    margin: 0;
+                }
+                .preview-header p {
+                    font-size: 12px;
+                    color: #64748b;
+                    margin-top: 5px;
+                    margin-bottom: 0;
+                }
+                .preview-body {
+                    font-size: 14px;
+                    line-height: 1.8;
+                    margin-bottom: 40px;
+                    position: relative;
+                    z-index: 1;
+                }
+                .preview-body p {
+                    margin-bottom: 15px;
+                    text-align: justify;
+                }
+                .preview-footer {
+                    margin-top: 60px;
+                    position: relative;
+                    z-index: 1;
+                }
+                .preview-doc-numbers {
+                    font-size: 11px;
+                    color: #64748b;
+                    margin-bottom: 20px;
+                }
+                .preview-doc-numbers strong {
+                    color: #1e293b;
+                }
+                .preview-signature-block {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 40px;
+                }
+                .preview-signature-box {
+                    text-align: center;
+                    width: 200px;
+                }
+                .preview-signature-line {
+                    border-top: 1px solid #1e293b;
+                    padding-top: 8px;
+                    font-size: 12px;
+                    color: #475569;
+                }
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    .print-preview-wrapper, .print-preview-wrapper * {
+                        visibility: visible;
+                    }
+                    .print-preview-toolbar {
+                        display: none !important;
+                    }
+                    .print-preview-content {
+                        border: none !important;
+                        padding: 0 !important;
+                    }
+                    .document-preview {
+                        border: 2px solid #000 !important;
+                        padding: 30px !important;
+                    }
+                }
+            </style>
+
             <!-- Alerts -->
             <?php if (!empty($success)) : ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -251,7 +374,15 @@ require_once __DIR__ . '/../includes/navbar.php';
                                                     data-bs-target="#editModal<?php echo (int) $template['id']; ?>">
                                                 <i class="bi bi-pencil-square"></i> Edit
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger"
+                                            <button class="btn btn-sm btn-outline-success"
+                                                    data-template-id="<?php echo (int) $template['id']; ?>"
+                                                    data-template-name="<?php echo e($template['name']); ?>"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#printPreviewModal"
+                                                    onclick="previewTemplate(<?php echo (int) $template['id']; ?>)">
+                                                <i class="bi bi-printer"></i> Print
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger btn-delete-template"
                                                     data-template-id="<?php echo (int) $template['id']; ?>"
                                                     data-template-name="<?php echo e($template['name']); ?>">
                                                 <i class="bi bi-trash3"></i> Delete
@@ -491,8 +622,110 @@ require_once __DIR__ . '/../includes/navbar.php';
             </div>
         </div>
     </div>
+
+    <!-- Print Preview Modal -->
+    <div class="modal fade" id="printPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-printer me-2"></i>Print Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="printPreviewContainer" class="print-preview-wrapper">
+                        <div class="print-preview-toolbar">
+                            <span class="text-muted small">Preview with sample data</span>
+                            <button class="btn btn-sm btn-primary" onclick="printCurrentPreview()">
+                                <i class="bi bi-printer-fill me-1"></i> Print
+                            </button>
+                        </div>
+                        <div id="printPreviewContent" class="print-preview-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <script>
+        var templatePreviewData = <?php echo json_encode($templates); ?>;
+
+        function previewTemplate(templateId) {
+            var template = templatePreviewData.find(function(t) { return t.id === templateId; });
+            if (!template) return;
+
+            var sampleData = {
+                '{{FULL_NAME}}': 'Juan Dela Cruz',
+                '{{ADDRESS}}': '123 Rizal Street, Purok 1',
+                '{{DOCUMENT_NUMBER}}': 'SAMPLE-0000-0001',
+                '{{CONTROL_NUMBER}}': 'SAMPLE-00-000001',
+                '{{PURPOSE}}': 'Sample Purpose',
+                '{{DATE}}': new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                '{{SIGNATORY_1}}': template.signature_line_1 || 'Barangay Captain',
+                '{{SIGNATORY_2}}': template.signature_line_2 || 'Secretary'
+            };
+
+            var placeholders = Object.keys(sampleData);
+            var values = Object.values(sampleData);
+
+            var header = template.header_content || '';
+            var body = template.body_content || '';
+            var footer = template.footer_content || '';
+            var watermark = template.watermark_text || '';
+
+            placeholders.forEach(function(key, index) {
+                header = header.split(key).join(values[index]);
+                body = body.split(key).join(values[index]);
+                footer = footer.split(key).join(values[index]);
+            });
+
+            var watermarkStyle = '';
+            if (watermark) {
+                watermarkStyle = '<div class="preview-watermark">' + watermark + '</div>';
+            }
+
+            var content = '<div class="document-preview">' +
+                watermarkStyle +
+                '<div class="preview-header">' + header + '</div>' +
+                '<div class="preview-body">' + body + '</div>' +
+                '<div class="preview-footer">' +
+                '<div class="preview-doc-numbers">' +
+                '<div><strong>Document No:</strong> ' + sampleData['{{DOCUMENT_NUMBER}}'] + '</div>' +
+                '<div><strong>Control No:</strong> ' + sampleData['{{CONTROL_NUMBER}}'] + '</div>' +
+                '</div>' +
+                footer +
+                '</div>' +
+                '</div>';
+
+            document.getElementById('printPreviewContent').innerHTML = content;
+        }
+
+        function printCurrentPreview() {
+            var content = document.getElementById('printPreviewContent').innerHTML;
+            var printWindow = window.open('', '_blank', 'width=900,height=700');
+            printWindow.document.write('<!DOCTYPE html><html><head><title>Print Preview</title>' +
+                '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">' +
+                '<style>' +
+                '* { margin: 0; padding: 0; box-sizing: border-box; }' +
+                'body { font-family: "Inter", sans-serif; background: #ffffff; color: #1e293b; padding: 40px; max-width: 800px; margin: 0 auto; }' +
+                '.document-preview { position: relative; border: 2px solid #1e293b; padding: 40px; min-height: 600px; background: #ffffff; }' +
+                '.preview-watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 80px; color: rgba(0,0,0,0.04); pointer-events: none; z-index: 0; white-space: nowrap; }' +
+                '.preview-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #1e293b; }' +
+                '.preview-header h1 { font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }' +
+                '.preview-header p { font-size: 12px; color: #64748b; margin-top: 5px; }' +
+                '.preview-body { font-size: 14px; line-height: 1.8; margin-bottom: 40px; }' +
+                '.preview-body p { margin-bottom: 15px; text-align: justify; }' +
+                '.preview-footer { margin-top: 60px; }' +
+                '.preview-doc-numbers { font-size: 11px; color: #64748b; margin-bottom: 20px; }' +
+                '.preview-doc-numbers strong { color: #1e293b; }' +
+                '.signature-block { display: flex; justify-content: space-between; margin-top: 40px; }' +
+                '.signature-box { text-align: center; width: 200px; }' +
+                '.signature-line { border-top: 1px solid #1e293b; padding-top: 8px; font-size: 12px; color: #475569; }' +
+                '@media print { body { padding: 0; } .document-preview { border: 2px solid #000; padding: 30px; } @page { margin: 20mm; } }' +
+                '</style></head><body>' + content + '</body></html>');
+            printWindow.document.close();
+            setTimeout(function() { printWindow.print(); }, 300);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const toastOverlay = document.getElementById('deleteToastOverlay');
             const toastCancel = document.getElementById('deleteToastCancel');
@@ -501,7 +734,7 @@ require_once __DIR__ . '/../includes/navbar.php';
             
             let pendingDeleteId = null;
             
-            document.querySelectorAll('[data-template-id]').forEach(function(button) {
+            document.querySelectorAll('.btn-delete-template[data-template-id]').forEach(function(button) {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     pendingDeleteId = this.getAttribute('data-template-id');

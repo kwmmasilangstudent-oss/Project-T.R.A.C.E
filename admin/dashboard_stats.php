@@ -67,7 +67,7 @@ try {
     </a>
 </div>
 <div class="col-md-3">
-    <a href="<?php echo BASE_URL; ?>/secretary/requests.php" class="text-decoration-none">
+    <a href="<?php echo BASE_URL; ?>/admin/applications.php?status=pending" class="text-decoration-none">
         <div class="glass-card p-3">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -87,7 +87,7 @@ try {
     </a>
 </div>
 <div class="col-md-3">
-    <a href="<?php echo BASE_URL; ?>/secretary/requests.php?status=approved" class="text-decoration-none">
+    <a href="<?php echo BASE_URL; ?>/admin/applications.php?status=approved" class="text-decoration-none">
         <div class="glass-card p-3">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -101,7 +101,7 @@ try {
     </a>
 </div>
 <div class="col-md-3">
-    <a href="<?php echo BASE_URL; ?>/secretary/requests.php?status=rejected" class="text-decoration-none">
+    <a href="<?php echo BASE_URL; ?>/admin/applications.php?status=rejected" class="text-decoration-none">
         <div class="glass-card p-3">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
